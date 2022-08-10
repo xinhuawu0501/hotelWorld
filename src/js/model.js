@@ -1,0 +1,86 @@
+import { API_KEY, options, optionsForGeoCoding } from "./config";
+import searchView from "../view/searchView";
+export const state = {
+  filters: {},
+  page: 1,
+  curId: "",
+  curHotel: {},
+  search: {
+    query: {
+      location: "",
+      order_by: "",
+      adult_num: 0,
+      kid_num: 0,
+      room_num: 0,
+      checkin_date: "",
+      checkout_date: "",
+    },
+
+    results: [],
+    // language: "en",
+  },
+};
+
+export const getGeo = async function (address) {
+  try {
+    const res = await fetch(
+      "https://trueway-geocoding.p.rapidapi.com/Geocode?address=taipei&language=en",
+      optionsForGeoCoding
+    );
+    const data = await res.json();
+    const { lat, lng } = data.results[0].location;
+    state.search.location = [lat, lng];
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const getSearchResult = async function () {
+  try {
+    //search location
+    await getGeo();
+
+    //get search query
+    const query = searchView.getQuery();
+    if (!query) return;
+    state.search.query = query;
+
+    console.log(query);
+    //fetch data
+    const res = await fetch(
+      `https://${options.headers["X-RapidAPI-Host"]}/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=2022-10-01&filter_by_currency=AED&locale=en-gb&checkin_date=2022-09-30&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`,
+      options
+    );
+    if (!res.ok) throw new Error(`Something went wrong:( Please try again!`);
+    const data = await res.json();
+    console.log(data);
+    state.search.results = data.result.map((data) => {
+      return {
+        hotel_name: data.hotel_name,
+        hotel_id: data.hotel_id,
+        hotel_address: data.address,
+        checkin_time: data.checkin,
+        checkout_time: data.checkout,
+        distance_to_city_center: data.distance_to_cc,
+        include_breakfast: data.hotel_include_breakfast,
+        free_cancellable: data.is_free_cancellable,
+        photo: data.main_photo_url,
+        review: [data.review_score, data.review_score_word, data.review_nr],
+        url: data.url,
+        unit_config: data.unit_configuration_label,
+        bookmarked: "false",
+      };
+    });
+    console.log(state.search.results);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export const findCurHotel = () => {
+  const curHotel = state.search.results.find((result) => {
+    return result.hotel_id == state.curId;
+  });
+  console.log(curHotel);
+  state.curHotel = curHotel;
+};

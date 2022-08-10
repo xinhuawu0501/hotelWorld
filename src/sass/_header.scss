@@ -1,0 +1,58 @@
+@import './base';
+
+.header{
+    grid-area: head;
+
+    .search{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-content: space-around;
+        padding: 2rem 5rem;
+        height: 100%;
+
+        &__btn{
+            // height: 4rem;
+            // width: 5rem;
+            display: flex;
+            align-items: center;
+            margin-left: 1rem;
+            
+        }
+
+        &__input-item{
+            display: flex;
+            align-items: center;
+            margin-right: 1.5rem;
+        }
+
+        label{
+            margin-right: 0.8rem;
+        }
+        input{
+            background-color: $color-grey-light-2;
+            border-radius: 2rem;
+            height: 4rem;
+            padding: 1rem;
+        }
+        select{
+            display: flex;
+            padding: 1rem;
+            background-color: $color-grey-light-1;
+            border-radius: 2rem;
+
+        }
+
+        input[type='number']{
+            width: 6rem
+        }
+
+        &__icon{
+            height: 3rem;
+            width: 3rem;
+        }
+    }
+}
+
+
+

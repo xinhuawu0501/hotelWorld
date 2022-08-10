@@ -1,0 +1,14 @@
+.search-results{
+    width: 100%;
+    height: 100%;
+    grid-area: list;
+    background-color: $color-grey-light-1;
+    .results{
+
+    }
+}
+
+.details{
+    grid-area: detail;
+    
+}

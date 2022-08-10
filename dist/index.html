@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/index.f7626f62.css">
+    <title>HotelWorld</title>
+    <script src="/index.e37f48ea.js" defer=""></script>
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <!-- <img src="src/img/logo.png" alt="Logo" class="header__logo" /> -->
+        <form class="search">
+          <input type="text" class="search__field search__input-item" placeholder="Search hotel by location...">
+          <span class="search__input-item">
+            <label for="order-by">Sort by</label>
+            <select name="order-by" id="order-by">
+              <option value="popularity">Popularity</option>
+              <option value="review-score">Review score</option>
+              <option value="price">Price</option>
+            </select>
+          </span>
+
+          <span class="search__input-item">
+            <label for="guest__num-adult">Adult</label>
+            <input type="number" class="guest__num" min="0" value="1">
+          </span>
+          <span class="search__input-item">
+            <label for="guest__num-kid">Kid</label>
+            <input type="number" class="guest__num" min="0" value="0">
+          </span>
+          <span class="search__input-item">
+            <label for="room__num">Room number</label>
+            <input type="number" class="room__num" min="0" value="1">
+          </span>
+          <span class="search__input-item">
+            <label for="check-in-date">Check-in</label>
+            <input type="date" class="calender">
+          </span>
+          <span class="search__input-item">
+            <label for="check-out-date">Check-out</label>
+            <input type="date" class="calender">
+          </span>
+
+          <button class="btn search__btn">
+            <svg class="search__icon">
+              <use href="/icons.21bad73c.svg#icon-search"></use>
+            </svg>
+            <span>Search</span>
+          </button>
+        </form>
+
+        <nav class="nav">
+          <ul class="nav__list">
+            <li class="nav__item"></li>
+            <li class="nav__item">
+              <!-- <button class="nav__btn nav__btn--bookmarks">
+              <svg class="nav__icon">
+                <use href="src/img/icons.svg#icon-bookmark"></use>
+              </svg>
+              <span>Bookmarks</span>
+            </button>
+            <div class="bookmarks">
+              <ul class="bookmarks__list"> -->
+              <!-- <div class="message">
+                  <div>
+                    <svg>
+                      <use href="src/img/icons.svg#icon-smile"></use>
+                    </svg>
+                  </div>
+                  <p>
+                    No bookmarks yet. Find a nice recipe and bookmark it :)
+                  </p>
+                </div> -->
+
+              <!-- <li class="preview">
+                  <a class="preview__link" href="#23456">
+                    <figure class="preview__fig">
+                      <img src="src/img/test-1.jpg" alt="Test" />
+                    </figure>
+                    <div class="preview__data">
+                      <h4 class="preview__name">
+                        Pasta with Tomato Cream ...
+                      </h4>
+                      <p class="preview__publisher">The Pioneer Woman</p>
+                    </div>
+                  </a>
+                </li> -->
+              <!-- </ul> -->
+            </li>
+          </ul>
+        </nav>
+      </header>
+
+      <div class="search-results">
+        <ul class="results"></ul>
+
+        <div class="pagination">
+          <!-- <button class="btn--inline pagination__btn--prev">
+          <svg class="search__icon">
+            <use href="src/img/icons.svg#icon-arrow-left"></use>
+          </svg>
+          <span>Page 1</span>
+        </button>
+        <button class="btn--inline pagination__btn--next">
+          <span>Page 3</span>
+          <svg class="search__icon">
+            <use href="src/img/icons.svg#icon-arrow-right"></use>
+          </svg>
+        </button> -->
+        </div>
+
+        <!-- <p class="copyright">
+        &copy; Copyright by
+        
+      </p>
+    </div> -->
+      </div>
+      <div class="details">
+        <!-- <img src="" alt="">
+        <h2 class="details__hotel-name">${data.hotel_name}</h2>
+        <span class="details__distance-to-cc">${data.hotel_distance_to_city_center}</span>
+
+        <span class="details__checkin-time">Checkin time ${data.checkin_time}</span>
+        <span class="details__checkout-time">Checkout time${data.checkout_time}</span>
+        <span class="details__review">
+            <svg>
+                <use use href="src/img/icons.svg#icon-arrow-left"></use>
+            </svg>
+        <span class="details__review-score">${data.review[0]}</span>
+        <span class="details__review-description">${data.review[1]}</span>
+        </span>
+            <a href="${data.url}"></a> -->
+      </div>
+
+      <!-- <div class="spinner">
+        <svg>
+          <use href="src/img/icons.svg#icon-loader"></use>
+        </svg>
+      </div> -->
+    </div>
+  </body>
+</html>
+
+<!-- {hotel_name: 'Hotel Resonance Taipei, Tapestry Collection by Hilton', hotel_id: 6880121, hotel_address: 'No. 7 Linsen S. Rd, Happy Village', checkin_time: {…}, checkout_time: {…}, …}
+checkin_time: {until: '', from: '15:00'}
+checkout_time: {from: '', until: '12:00'}
+distance_to_city_center: "0.65"
+free_cancellable: 1
+hotel_address: "No. 7 Linsen S. Rd, Happy Village"
+hotel_id: 6880121
+hotel_name: "Hotel Resonance Taipei, Tapestry Collection by Hilton"
+include_breakfast: 0
+photo: "https://cf.bstatic.com/xdata/images/hotel/square60/276274125.jpg?k=10b6d1432106ccd6d37d34d02066243871813e6315120eb0a7d945bfb91f5fcc&o="
+review: (3) [9.2, 'Superb', 1744]
+unit_config: "<b>Hotel room</b>: 1 bed"
+url: "https://www.booking.com/hotel/tw/resonance.html"
+[[Prototype]]: Object -->
