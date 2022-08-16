@@ -3,25 +3,42 @@ import * as model from "./model.js";
 import searchView from "../view/searchView.js";
 import previewView from "../view/previewView.js";
 import resultView from "../view/resultView.js";
-console.log(model.state);
+import paginationView from "../view/paginationView.js";
 
 const controlSearch = async function () {
-  //render spinner
-  previewView.renderSpinner();
-  await model.getSearchResult();
+  try {
+    //render spinner
+    previewView.renderSpinner();
+    await model.getSearchResult();
 
-  //render preview
-  previewView._render(model.state.search.results);
+    //render preview
+    previewView._render(model.getResultPerPage(model.state.page));
+    //pagination
+    paginationView._render(model.state.page, model.state);
+  } catch (err) {
+    alert(err);
+    console.log(err);
+  }
 };
 
-const controlResult = function (id) {
+const controlResult = async function () {
+  resultView.renderSpinner();
+
   model.findCurHotel();
-  console.log(model.state);
+  await model.loadCurHotelFeatures();
   resultView._render(model.state.curHotel);
+};
+
+const controlPagination = (goTo) => {
+  //update preview list
+  previewView._render(model.getResultPerPage(goTo));
+  //update button
+  paginationView._render(goTo, model.state);
 };
 
 const init = () => {
   searchView.addHandler(controlSearch);
   previewView._addHandler(controlResult);
+  paginationView._addHandler(controlPagination);
 };
 init();

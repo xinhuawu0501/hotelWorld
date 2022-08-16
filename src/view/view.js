@@ -13,6 +13,8 @@ export default class View {
             </svg>
         </div>
         `;
+    console.log(this._parentEl);
+    console.log(`${this._parentEl} is rendering spinner`);
     this._parentEl.insertAdjacentHTML("afterbegin", markup);
   }
 

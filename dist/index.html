@@ -18,7 +18,7 @@
             <label for="order-by">Sort by</label>
             <select name="order-by" id="order-by">
               <option value="popularity">Popularity</option>
-              <option value="review-score">Review score</option>
+              <option value="review_score">Review score</option>
               <option value="price">Price</option>
             </select>
           </span>
@@ -95,21 +95,36 @@
       </header>
 
       <div class="search-results">
-        <ul class="results"></ul>
+        <ul class="results">
+          <a href="#"></a>
+
+          <!-- <li class="preview">
+            <a class="preview__link preview__link--active" href="#">
+              <figure class="preview__fig">
+                <img src="" alt="Test" />
+              </figure>
+              <h4 class="preview__title">hotel</h4>
+              <p class="preview__address">address</p>
+              <div class="preview__score">
+                <div class="preview__score-num">4.3</div>
+              </div>
+            </a>
+          </li> -->
+        </ul>
 
         <div class="pagination">
-          <!-- <button class="btn--inline pagination__btn--prev">
-          <svg class="search__icon">
-            <use href="src/img/icons.svg#icon-arrow-left"></use>
-          </svg>
-          <span>Page 1</span>
-        </button>
-        <button class="btn--inline pagination__btn--next">
-          <span>Page 3</span>
-          <svg class="search__icon">
-            <use href="src/img/icons.svg#icon-arrow-right"></use>
-          </svg>
-        </button> -->
+          <!-- <button class="btn--inline pagination__btn--prev" data-goto="1">
+            <svg class="search__icon">
+              <use href="src/img/icons.svg#icon-arrow-left"></use>
+            </svg>
+            <span>Page 1</span>
+          </button>
+          <button class="btn--inline pagination__btn--next" data-goto="3">
+            <span>Page 3</span>
+            <svg class="search__icon">
+              <use href="src/img/icons.svg#icon-arrow-right"></use>
+            </svg>
+          </button> -->
         </div>
 
         <!-- <p class="copyright">
@@ -119,20 +134,68 @@
     </div> -->
       </div>
       <div class="details">
-        <!-- <img src="" alt="">
-        <h2 class="details__hotel-name">${data.hotel_name}</h2>
-        <span class="details__distance-to-cc">${data.hotel_distance_to_city_center}</span>
+        <!-- <img class="details__img" src="" alt="Hotel photo"> -->
 
-        <span class="details__checkin-time">Checkin time ${data.checkin_time}</span>
-        <span class="details__checkout-time">Checkout time${data.checkout_time}</span>
-        <span class="details__review">
-            <svg>
-                <use use href="src/img/icons.svg#icon-arrow-left"></use>
-            </svg>
-        <span class="details__review-score">${data.review[0]}</span>
-        <span class="details__review-description">${data.review[1]}</span>
-        </span>
-            <a href="${data.url}"></a> -->
+        <!-- <div class="details__header">
+          <div class="details__header-main">
+            <div class="details__header-main__isFreeCancellable">
+              Free cancellable
+            </div>
+            <div class="details__header-main__hasBreakfast">
+              Breakfast included
+            </div>
+            <h2 class="details__header-main__hotel-name">${data.hotel_name}</h2>
+          </div>
+
+          <div class="details__header__hotel-address">
+            ${data.hotel_address}
+          </div>
+          <span class="details__review">
+            <span class="details__review-score">${data.review[0]}</span>
+            <span class="details__review-description">${data.review[1]}</span>
+          </span>
+        </div>
+        <div class="details__info">
+          <h3 class="details__info__title">Information</h3>
+          <div class="details__info__price">
+            <div class="details__info__price-total">Total price: NTD 2743</div>
+            <div class="details__info__price-one-night">NTD 674 per night</div>
+          </div>
+          <div class="details__info__item details__distance-to-cc">
+            <b>Distance from city center &nbsp</b>
+            ${data.distance_to_city_center}
+          </div>
+          <div class="details__info__item details__checkin-time">
+            <b>Checkin time &nbsp</b> ${data.checkin_time.from}
+          </div>
+          <div class="details__info__item details__checkout-time">
+            <b>Checkout time &nbsp</b> ${data.checkout_time.until}
+          </div> -->
+
+          <!-- <a href="${data.url}">${data.url}</a> -->
+          <!-- <div class="details__nearBy">
+            <h3 class="details__nearBy-title">
+              Location Highlights</h3>
+            <div class="details__nearBy-landmark">
+              <h4 class="details__nearBy-landmark-title">Landmark</h4>
+            </div>
+            <div class="details__nearBy-station">
+              <h4 class="details__nearBy-station-title">Station</h4>
+              <div class="details__nearBy-station-item">
+                <div class="deatils__nearBy-station-name">Berline central station</div>
+                <div class="deatils__nearBy-station-distance">300 m</div>
+              </div>
+             
+
+            </div>
+  
+          </div> -->
+          
+        </div>
+        
+        <!-- <div class="details__FAQ">
+          <div class="details__FAQ-title">FAQ</div>
+        </div> -->
       </div>
 
       <!-- <div class="spinner">
@@ -140,21 +203,7 @@
           <use href="src/img/icons.svg#icon-loader"></use>
         </svg>
       </div> -->
-    </div>
+    
   </body>
 </html>
 
-<!-- {hotel_name: 'Hotel Resonance Taipei, Tapestry Collection by Hilton', hotel_id: 6880121, hotel_address: 'No. 7 Linsen S. Rd, Happy Village', checkin_time: {…}, checkout_time: {…}, …}
-checkin_time: {until: '', from: '15:00'}
-checkout_time: {from: '', until: '12:00'}
-distance_to_city_center: "0.65"
-free_cancellable: 1
-hotel_address: "No. 7 Linsen S. Rd, Happy Village"
-hotel_id: 6880121
-hotel_name: "Hotel Resonance Taipei, Tapestry Collection by Hilton"
-include_breakfast: 0
-photo: "https://cf.bstatic.com/xdata/images/hotel/square60/276274125.jpg?k=10b6d1432106ccd6d37d34d02066243871813e6315120eb0a7d945bfb91f5fcc&o="
-review: (3) [9.2, 'Superb', 1744]
-unit_config: "<b>Hotel room</b>: 1 bed"
-url: "https://www.booking.com/hotel/tw/resonance.html"
-[[Prototype]]: Object -->

@@ -8,6 +8,11 @@ $color-grey-light-2: #f2efee; // Light lines
 $color-grey-light-3: #d3c7c3; // Light text (placeholder)
 $color-grey-dark-1: #615551; // Normal text
 $color-grey-dark-2: #918581; // Lighter text
+$color-star-yellow:rgb(255, 200, 0); 
+
+$font-color: rgb(50, 46, 46);
+$font-color-light: rgba(50, 46, 46, 0.811);
+$font-color-dark: rgb(20, 18, 18);
 
 $gradient: linear-gradient(to right bottom, $color-grad-1, $color-grad-2);
 
@@ -15,7 +20,6 @@ $bp-large: 78.15em; // 1250px
 $bp-medium: 61.25em; // 980px
 $bp-small: 37.5em; // 600px
 $bp-smallest: 31.25em; // 500px
-
 * {
   margin: 0;
   padding: 0;
@@ -27,6 +31,9 @@ $bp-smallest: 31.25em; // 500px
   box-sizing: inherit;
   background: none;
   border: none;
+  text-decoration: none;
+  appearance: none;
+  
 }
 
 html {
@@ -60,7 +67,7 @@ body {
 
   display: grid;
   grid-template-rows:minmax(18rem, max-content) minmax(60rem, auto);
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: minmax(35rem, 1fr) 2fr;
   grid-template-areas:
     'head head'
     'list detail';
@@ -72,4 +79,8 @@ body {
   // }
 }
 
-
+@mixin icon-size-margin {
+  height: 2rem;
+  width: 2rem;
+  margin-right: 0.5rem;
+}

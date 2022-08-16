@@ -1,3 +1,5 @@
+@import './search';
+@import './base';
 .spinner {
     margin: 5rem auto;
     text-align: center;
@@ -18,4 +20,36 @@
     100% {
       transform: rotate(360deg);
     }
+  }
+
+  button{
+    padding: 1rem 2rem;
+    border-radius: 5rem;
+    background-color: $color-grey-light-2;
+    color: $color-primary;
+    @include title(1.4rem);
+    @include flex-row-c;
+    
+    &:hover{
+      filter: brightness(0.9)
+    }
+  }
+
+  .pagination{
+    @include flex-row-c;
+    justify-content: space-between;
+    padding: 2rem;
+    &__btn--prev{
+      justify-self: flex-start
+    }
+    &__btn--next{
+      justify-self: flex-end
+    }
+  }
+  
+
+  .search__icon{
+    @include icon-size-margin;
+    fill:$color-primary;
+    
   }

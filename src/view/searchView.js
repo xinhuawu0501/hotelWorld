@@ -37,7 +37,7 @@ class SearchView {
 
     return {
       location: result[0].value.toLowerCase(),
-      order_by: result[1].value,
+      order_by: result[1].value.toLowerCase(),
       adult_num: +result[2].value,
       kid_num: +result[3].value,
       room_num: +result[4].value,

@@ -1,0 +1,192 @@
+@import './search';
+@import './base';
+@import './components';
+@mixin label($color) {
+    background-color: $color;
+    border-radius: 1rem;
+    @include title(1.2rem);
+    padding: 1rem 1.5rem;
+    color: #ffffff;
+    width: max-content;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+}
+.main-title{
+    @include title(2.2rem);
+    @include flex-row-c;
+
+}
+.sub-title{
+    @include title(1.8rem)
+}
+.details{
+    &__section{
+        padding: 3rem;
+    }
+    grid-area: detail;
+    &__img{
+        width: 100%;
+        height: 40rem;
+
+        @supports(object-fit: cover){
+            object-fit: cover;  
+        }
+    }
+
+    background-color: $color-grey-light-1;
+   
+    &__link{
+        @include label(rgb(10, 10, 124));
+        @include flex-row-c;
+        margin-left: 2rem;
+        @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){
+                
+            &::after{
+                content: "";
+                margin-left: 1rem;
+                @include icon-before-element-mask(url('../img/arrow-up-right-from-square-solid.svg'), white)
+            }    
+            }
+
+
+    }
+    &__header{
+        display: grid;
+        grid-template-columns: 1fr 14rem;
+        grid-template-rows: minmax(max-content, 1.5fr) minmax(max-content, 1fr);
+        grid-template-areas: 
+        "main review"
+        "address address";
+        align-items: center;
+
+       
+        &-main{
+            grid-area: main;
+            display: flex;
+            flex-wrap: wrap;
+            &__isFreeCancellable{
+                @include label(rgb(67, 112, 249))
+                    
+            }
+            &__hasBreakfast{
+                @include label(green)
+
+
+            }
+    
+            &__hotel-name{
+                @include title(2.4rem);
+                width: 100%;
+            }
+        }
+       
+        &__hotel-address{
+            grid-area: address;
+            @include title(1.6rem);
+            @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){
+                
+                &::before{
+                    content: "";
+                    display: inline-block;
+                    @include icon-before-element-mask(url('../img/location-dot-solid.svg'), green)
+                }    
+                }
+        }
+    }
+        
+    &__info{
+        height: max-content;
+        &__price-total{
+            @include title(2.2rem);
+        }
+        &__price-one-night{
+            color: $font-color-light;
+        }
+      
+        &__item{
+            padding: 1rem 0;
+            @include flex-row-c;
+        }
+        @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){
+            &__title::before{
+                content: '';
+                @include icon-before-element-mask(url('../img//circle-info-solid.svg'), rgb(67, 112, 249))
+            }
+            &__item::before{
+                content: "";
+                @include icon-before-element-mask(url('../img/angle-right-solid.svg'), $font-color);
+                }  
+            }
+    }
+    
+        
+        
+    
+    &__review{
+        @include flex-col-c;
+        @include border-radius-card;
+        align-self: flex-start;
+        justify-self: end;
+        padding: 1.5rem;
+        width: 12rem;
+        grid-area: review;
+        background-color: #ffffff;
+        &-score{
+            @include title(2.4rem)
+        }
+        &-description{
+            @include title(1.2rem)
+        }
+       
+    }
+
+    &__nearBy{
+        display: grid;
+        grid-template-columns: minmax(max-content 1fr) minmax(max-content 1fr);
+        grid-template-rows: max-content 1fr;
+        grid-template-areas: 
+        "title title"
+        "landmark station";
+        grid-gap: 1rem;
+        &-title{
+            @include flex-row-c;
+            grid-area: title;
+            @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){
+                &::before{
+                    content: "";
+                    @include icon-before-element-mask(url('../img/location-crosshairs-solid.svg'), $font-color);
+                    }
+                   
+                }
+        }
+        &-landmark{
+            &-title{
+                margin-bottom: 0.5rem;
+            }
+            grid-area: landmark;
+            display: flex;
+            flex-direction: column;
+
+            &-item{
+                padding: 1rem 0;
+            }
+        }
+        &-station{
+            max-width: 30rem;
+            grid-area: station;
+            &-item{
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: 1fr;
+                padding: 1rem 0;
+                border-bottom: $font-color-light 1px solid;
+            }
+            &-distance{
+                justify-self: end;
+            }
+        }
+    }
+}
+
+
+

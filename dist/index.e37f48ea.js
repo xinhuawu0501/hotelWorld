@@ -541,31 +541,48 @@ var _previewViewJs = require("../view/previewView.js");
 var _previewViewJsDefault = parcelHelpers.interopDefault(_previewViewJs);
 var _resultViewJs = require("../view/resultView.js");
 var _resultViewJsDefault = parcelHelpers.interopDefault(_resultViewJs);
-console.log(_modelJs.state);
+var _paginationViewJs = require("../view/paginationView.js");
+var _paginationViewJsDefault = parcelHelpers.interopDefault(_paginationViewJs);
 const controlSearch = async function() {
-    //render spinner
-    (0, _previewViewJsDefault.default).renderSpinner();
-    await _modelJs.getSearchResult();
-    //render preview
-    (0, _previewViewJsDefault.default)._render(_modelJs.state.search.results);
+    try {
+        //render spinner
+        (0, _previewViewJsDefault.default).renderSpinner();
+        await _modelJs.getSearchResult();
+        //render preview
+        (0, _previewViewJsDefault.default)._render(_modelJs.getResultPerPage(_modelJs.state.page));
+        //pagination
+        (0, _paginationViewJsDefault.default)._render(_modelJs.state.page, _modelJs.state);
+    } catch (err) {
+        alert(err);
+        console.log(err);
+    }
 };
-const controlResult = function(id) {
+const controlResult = async function() {
+    (0, _resultViewJsDefault.default).renderSpinner();
     _modelJs.findCurHotel();
-    console.log(_modelJs.state);
+    await _modelJs.loadCurHotelFeatures();
     (0, _resultViewJsDefault.default)._render(_modelJs.state.curHotel);
+};
+const controlPagination = (goTo)=>{
+    //update preview list
+    (0, _previewViewJsDefault.default)._render(_modelJs.getResultPerPage(goTo));
+    //update button
+    (0, _paginationViewJsDefault.default)._render(goTo, _modelJs.state);
 };
 const init = ()=>{
     (0, _searchViewJsDefault.default).addHandler(controlSearch);
     (0, _previewViewJsDefault.default)._addHandler(controlResult);
+    (0, _paginationViewJsDefault.default)._addHandler(controlPagination);
 };
 init();
 
-},{"./config.js":"k5Hzs","./model.js":"Y4A21","../view/searchView.js":"b2EbH","../view/previewView.js":"fFeKs","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../view/resultView.js":"LyN8l"}],"k5Hzs":[function(require,module,exports) {
+},{"./config.js":"k5Hzs","./model.js":"Y4A21","../view/searchView.js":"b2EbH","../view/previewView.js":"fFeKs","../view/resultView.js":"LyN8l","../view/paginationView.js":"0EmXV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "API_KEY", ()=>API_KEY);
 parcelHelpers.export(exports, "options", ()=>options);
 parcelHelpers.export(exports, "optionsForGeoCoding", ()=>optionsForGeoCoding);
+parcelHelpers.export(exports, "NUM_PER_PAGE", ()=>NUM_PER_PAGE);
 const API_KEY = "8212341a06msh116c63045407b15p1bffecjsn3f8fe6a12567";
 const options = {
     method: "GET",
@@ -581,6 +598,7 @@ const optionsForGeoCoding = {
         "X-RapidAPI-Host": "trueway-geocoding.p.rapidapi.com"
     }
 };
+const NUM_PER_PAGE = 10;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -619,12 +637,16 @@ parcelHelpers.export(exports, "state", ()=>state);
 parcelHelpers.export(exports, "getGeo", ()=>getGeo);
 parcelHelpers.export(exports, "getSearchResult", ()=>getSearchResult);
 parcelHelpers.export(exports, "findCurHotel", ()=>findCurHotel);
+parcelHelpers.export(exports, "loadCurHotelFeatures", ()=>loadCurHotelFeatures);
+parcelHelpers.export(exports, "getResultPerPage", ()=>getResultPerPage);
 var _config = require("./config");
 var _searchView = require("../view/searchView");
 var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
 const state = {
+    test_id: 1377073,
     filters: {},
     page: 1,
+    totalPage: 1,
     curId: "",
     curHotel: {},
     search: {
@@ -663,7 +685,7 @@ const getSearchResult = async function() {
         state.search.query = query;
         console.log(query);
         //fetch data
-        const res = await fetch(`https://${(0, _config.options).headers["X-RapidAPI-Host"]}/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=2022-10-01&filter_by_currency=AED&locale=en-gb&checkin_date=2022-09-30&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`, (0, _config.options));
+        const res = await fetch(`https://${(0, _config.options).headers["X-RapidAPI-Host"]}/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=en-gb&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`, (0, _config.options));
         if (!res.ok) throw new Error(`Something went wrong:( Please try again!`);
         const data = await res.json();
         console.log(data);
@@ -678,6 +700,7 @@ const getSearchResult = async function() {
                 include_breakfast: data.hotel_include_breakfast,
                 free_cancellable: data.is_free_cancellable,
                 photo: data.main_photo_url,
+                max_photo: data.max_1440_photo_url,
                 review: [
                     data.review_score,
                     data.review_score_word,
@@ -685,10 +708,15 @@ const getSearchResult = async function() {
                 ],
                 url: data.url,
                 unit_config: data.unit_configuration_label,
+                totalPrice: data.composite_price_breakdown.gross_amount.value,
+                facilities: data.hotel_facilities,
+                currency: data.currency_code,
+                pricePerNight: data.composite_price_breakdown.gross_amount_per_night.value,
                 bookmarked: "false"
             };
         });
-        console.log(state.search.results);
+        //update total page
+        state.totalPage = Math.ceil(state.search.results.length / (0, _config.NUM_PER_PAGE));
     } catch (err) {
         console.error(err);
     }
@@ -697,8 +725,31 @@ const findCurHotel = ()=>{
     const curHotel = state.search.results.find((result)=>{
         return result.hotel_id == state.curId;
     });
-    console.log(curHotel);
     state.curHotel = curHotel;
+};
+const loadCurHotelFeatures = async function() {
+    try {
+        const id = state.curId;
+        console.log(id);
+        const res = await fetch(`https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=en-gb`, (0, _config.options));
+        if (!res.ok) throw new Error("Something went wrong:( Please try again!");
+        const data = await res.json();
+        const landmark = data.location_highlights.popular_landmarks;
+        const nearByStation = data.location_highlights.nearby_stations;
+        console.log(landmark, nearByStation);
+        state.curHotel.landmark = landmark;
+        state.curHotel.nearByStation = nearByStation;
+        console.log(state.curHotel);
+    } catch (err) {
+        alert(err);
+        console.log(err);
+    }
+};
+const getResultPerPage = (page)=>{
+    state.page = page;
+    const start = (page - 1) * (0, _config.NUM_PER_PAGE);
+    const end = page * (0, _config.NUM_PER_PAGE);
+    return state.search.results.slice(start, end);
 };
 
 },{"./config":"k5Hzs","../view/searchView":"b2EbH","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"b2EbH":[function(require,module,exports) {
@@ -736,7 +787,7 @@ class SearchView {
         }
         return {
             location: result[0].value.toLowerCase(),
-            order_by: result[1].value,
+            order_by: result[1].value.toLowerCase(),
             adult_num: +result[2].value,
             kid_num: +result[3].value,
             room_num: +result[4].value,
@@ -767,33 +818,29 @@ class PreviewView extends (0, _viewJsDefault.default) {
         return results.map((data)=>{
             return `
     <li class="preview">
-        <a class="preview__link preview__link--active" href="#${data.hotel_id}">
-          <figure class="preview__fig">
-            <img src="${data.photo}" alt="Test" />
-          </figure>
-          <div class="preview__data">
-            <h4 class="preview__title">${data.hotel_name}</h4>
-            <p class="preview__publisher">The Pioneer Woman</p>
-            <div class="preview__user-generated">
-              <svg>
-                <use href="src/img/icons.svg#icon-user"></use>
-              </svg>
-            </div>
-          </div>
-        </a>
-      </li>`;
+            <a class="preview__link preview__link--active" href="#${data.hotel_id}">
+              <figure class="preview__fig">
+                <img src="${data.photo}" alt="hotel photo" />
+              </figure>
+              <h4 class="preview__title">${data.hotel_name.length > 25 ? data.hotel_name.slice(0, 25) + "..." : data.hotel_name}</h4>
+              <p class="preview__address">${data.hotel_address}</p>
+              <div class="preview__score">
+                <div class="preview__score-num">${data.review[0]}</div>
+              </div>
+            </a>  
+          </li>`;
         }).join("");
     }
-    _render(results) {
-        this._data = results;
-        const markup = this._generateMarkUp(results);
+    _render(data) {
+        document.querySelector(".pagination").innerHTML = "";
+        this._data = data;
+        const markup = this._generateMarkUp(this._data);
         this._parentEl.innerHTML = "";
         this._parentEl.insertAdjacentHTML("afterbegin", markup);
     }
     _addHandler(handler) {
         window.addEventListener("hashchange", (e)=>{
             const id = window.location.hash.slice(1);
-            console.log(id);
             _modelJs.state.curId = id;
             handler();
         });
@@ -801,7 +848,7 @@ class PreviewView extends (0, _viewJsDefault.default) {
 }
 exports.default = new PreviewView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../js/model.js":"Y4A21","./view.js":"bx4GI","../img/icons.svg":"cMpiy"}],"bx4GI":[function(require,module,exports) {
+},{"../js/model.js":"Y4A21","./view.js":"bx4GI","../img/icons.svg":"cMpiy","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"bx4GI":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _iconsSvg = require("url:../img/icons.svg");
@@ -818,6 +865,8 @@ class View {
             </svg>
         </div>
         `;
+        console.log(this._parentEl);
+        console.log(`${this._parentEl} is rendering spinner`);
         this._parentEl.insertAdjacentHTML("afterbegin", markup);
     }
     clear() {
@@ -826,7 +875,7 @@ class View {
 }
 exports.default = View;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","url:../img/icons.svg":"loVOp"}],"loVOp":[function(require,module,exports) {
+},{"url:../img/icons.svg":"loVOp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"loVOp":[function(require,module,exports) {
 module.exports = require("./helpers/bundle-url").getBundleURL("hWUTQ") + "icons.dfd7a6db.svg" + "?" + Date.now();
 
 },{"./helpers/bundle-url":"lgJ39"}],"lgJ39":[function(require,module,exports) {
@@ -876,22 +925,61 @@ class ResultView extends (0, _viewDefault.default) {
     _data;
     _generateMarkup(data) {
         return `
-        <img src="" alt="">
-        <h2 class="details__hotel-name">${data.hotel_name}</h2>
-        <span class="details__distance-to-cc">${data.hotel_distance_to_city_center}</span>
+        <img class="details__img" src="${data.max_photo}" alt="Hotel photo">
+        <div class="details__header details__section">
+          <div class="details__header-main">
+          ${data.free_cancellable === 1 ? '<div class="details__header-main__isFreeCancellable">Free cancellable</div>' : ""}
+          ${data.include_breakfast === 1 ? '<div class="details__header-main__hasBreakfast">Breakfast included</div>' : ""}
+          <h2 class="details__header-main__hotel-name">${data.hotel_name}</h2>
+        </div>
 
-        <span class="details__checkin-time">Checkin time ${data.checkin_time}</span>
-        <span class="details__checkout-time">Checkout time${data.checkout_time}</span>
+        <div class="details__header__hotel-address">
+          ${data.hotel_address}
+        </div>
         <span class="details__review">
-            <svg>
-                <use use href="src/img/icons.svg#icon-arrow-left"></use>
-            </svg>
-        <span class="details__review-score">${data.review[0]}</span>
-        <span class="details__review-description">${data.review[1]}</span>
+          <span class="details__review-score">${data.review[0]}</span>
+          <span class="details__review-description">${data.review[1]}</span>
         </span>
-            <a href="${data.url}"></a>
-       
+      </div>
+      <div class="details__info details__section">
+        <h3 class="details__info__title main-title">Information</h3>
+        <div class="details__info__price">
+          <div class="details__info__price-total">Total price: ${data.currency}${Math.round(data.totalPrice)}</div>
+          <div class="details__info__price-one-night">${data.currency} ${data.pricePerNight} per night</div>
+        </div>
+        <div class="details__info__item details__distance-to-cc">
+          <b>Distance from city center &nbsp</b>
+          ${data.distance_to_city_center}
+        </div>
+        <div class="details__info__item details__checkin-time">
+          <b>Checkin time &nbsp</b> ${data.checkin_time.from}
+        </div>
+        <div class="details__info__item details__checkout-time">
+          <b>Checkout time &nbsp</b> ${data.checkout_time.until}
+        </div>
+      </div>
+        ${data.landmark || data.nearByStation ? `<div class="details__nearBy details__section">
+        <h3 class="details__nearBy-title main-title">Location Highlights</h3>
+        ${data.landmark ? `<div class="details__nearBy-landmark">
+        <h4 class="details__nearBy-landmark-title sub-title">Nearby Landmark</h4>
+        ${data.landmark.map((l)=>{
+            return `<div class="details__nearBy-landmark-item">${l}</div>`;
+        }).join(" ")}
+      </div>` : ""}
+        ${data.nearByStation ? `<div class="details__nearBy-station ">
+        <h4 class="details__nearBy-station-title sub-title">Nearby Station</h4>
+        ${data.nearByStation.map((s)=>{
+            return `
+            <div class="details__nearBy-station-item">
+              <div class="details__nearBy-station-name">${s.station_name}</div>
+              <div class="details__nearBy-station-distance">${s.distance_localized}</div>
+            </div>`;
+        }).join(" ")}  
+      </div>` : ""}
         
+      </div>` : ""}
+        
+        <a href="${data.url}" class="details__link">Visit Booking.com</a>
     `;
     }
     _render(data) {
@@ -903,6 +991,71 @@ class ResultView extends (0, _viewDefault.default) {
 }
 exports.default = new ResultView();
 
-},{"./view":"bx4GI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["fA0o9","aenu9"], "aenu9", "parcelRequiref439")
+},{"./view":"bx4GI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"0EmXV":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _view = require("./view");
+var _viewDefault = parcelHelpers.interopDefault(_view);
+var _configJs = require("../js/config.js");
+var _iconsSvg = require("url:../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
+class PaginationView extends (0, _viewDefault.default) {
+    _parentEl = document.querySelector(".pagination");
+    _data;
+    _generateMarkup(page, state) {
+        let html;
+        //first page && no other page
+        if (page === 1 && state.totalPage === 1) html = `
+        <button class="btn--inline pagination__btn--next" data-goto="${page}">
+            <span>Page ${page}</span>
+        </button>`;
+        else if (page === 1 && state.totalPage > 1) html = `
+        <button class="btn--inline pagination__btn--next" data-goto="${page + 1}">
+            <span>Page ${page + 1}</span>
+            <svg class="search__icon">
+            <use href="${0, _iconsSvgDefault.default}#icon-arrow-right"></use>
+            </svg>
+        </button>`;
+        else if (page === state.totalPage) html = `
+        <button class="btn--inline pagination__btn--prev" data-goto="${page - 1}">
+            <svg class="search__icon">
+                <use href="${0, _iconsSvgDefault.default}#icon-arrow-left"></use>
+            </svg>
+            <span>Page ${page - 1}</span>
+        </button>`;
+        else html = `
+      <button class="btn--inline pagination__btn--next"  data-goto="${page + 1}">
+            <span>Page ${page + 1}</span>
+            <svg class="search__icon">
+            <use href="${0, _iconsSvgDefault.default}#icon-arrow-right"></use>
+            </svg>
+        </button>
+        <button class="btn--inline pagination__btn--prev"  data-goto="${page - 1}">
+            <svg class="search__icon">
+                <use href="${0, _iconsSvgDefault.default}#icon-arrow-left"></use>
+            </svg>
+            <span>Page ${page - 1}</span>
+        </button>`;
+        return html;
+    }
+    _render(page, state) {
+        const markup = this._generateMarkup(page, state);
+        this.clear();
+        this._parentEl.insertAdjacentHTML("beforeend", markup);
+    }
+    _addHandler(handler) {
+        this._parentEl.addEventListener("click", (e)=>{
+            const btn = e.target.closest(".btn--inline");
+            if (!btn) return;
+            console.log(btn);
+            const goToPage = +btn.dataset.goto;
+            console.log(goToPage);
+            handler(goToPage);
+        });
+    }
+}
+exports.default = new PaginationView();
+
+},{"./view":"bx4GI","../js/config.js":"k5Hzs","url:../img/icons.svg":"loVOp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["fA0o9","aenu9"], "aenu9", "parcelRequiref439")
 
 //# sourceMappingURL=index.e37f48ea.js.map

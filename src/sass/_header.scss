@@ -1,5 +1,4 @@
 @import './base';
-
 .header{
     grid-area: head;
 
@@ -12,10 +11,8 @@
         height: 100%;
 
         &__btn{
-            // height: 4rem;
-            // width: 5rem;
-            display: flex;
-            align-items: center;
+         
+            padding: 0.5rem 1.5rem;
             margin-left: 1rem;
             
         }
@@ -48,8 +45,8 @@
         }
 
         &__icon{
-            height: 3rem;
-            width: 3rem;
+            @include icon-size-margin;
+
         }
     }
 }
