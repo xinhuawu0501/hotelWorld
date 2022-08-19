@@ -4,11 +4,10 @@ import searchView from "../view/searchView.js";
 import previewView from "../view/previewView.js";
 import resultView from "../view/resultView.js";
 import paginationView from "../view/paginationView.js";
-
 const controlSearch = async function () {
   try {
-    //render spinner
-    previewView.renderSpinner();
+    //skeleton loading
+    previewView._renderSkeleton();
     await model.getSearchResult();
 
     //render preview
@@ -23,9 +22,11 @@ const controlSearch = async function () {
 
 const controlResult = async function () {
   resultView.renderSpinner();
-
+  //find current hotel when user click preview
   model.findCurHotel();
-  await model.loadCurHotelFeatures();
+  //load hotel details using on hotel id
+  await model.loadCurHotelFacAndReviews();
+  await model.loadCurHotelNearbyandQA();
   resultView._render(model.state.curHotel);
 };
 
@@ -40,5 +41,9 @@ const init = () => {
   searchView.addHandler(controlSearch);
   previewView._addHandler(controlResult);
   paginationView._addHandler(controlPagination);
+  document.querySelector("a").addEventListener("click", (e) => {
+    e.preventDefault();
+    return false;
+  });
 };
 init();

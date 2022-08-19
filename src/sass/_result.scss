@@ -5,58 +5,238 @@
     background-color: $color;
     border-radius: 1rem;
     @include title(1.2rem);
-    padding: 1rem 1.5rem;
+    padding: 0.8rem 1rem;
     color: #ffffff;
     width: max-content;
     margin-right: 1rem;
     margin-bottom: 1rem;
 }
+@mixin reviewScoreLabel($font-size) {
+    border-radius: 1rem;
+    @include title($font-size);
+    color: #ffffff;
+    background-color: rgb(29, 29, 117);
+    @include flex-col-c;
+    justify-content: center;
+    min-width: min-content;
+    max-height: 12rem;
+    padding: 1rem;
+
+}
+@mixin sideHighlight($bg-color) {
+    width: 1.5rem;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: $bg-color;
+
+}
 .main-title{
-    @include title(2.2rem);
+    @include title(2rem);
     @include flex-row-c;
+    margin-bottom: 2rem;
 
 }
 .sub-title{
-    @include title(1.8rem)
+    @include title(1.8rem);
+    margin-bottom: 1.6rem;
+}
+
+.details__link{
+    grid-area: link;
+    @include label(rgb(10, 10, 124));
+    @include flex-row-c;
+    margin-left: 4rem;
+    &:visited{
+        color: #ffffff;
+    }
+   &-icon{
+       fill: white;
+   }
 }
 .details{
-    &__section{
-        padding: 3rem;
-    }
+    background-color: $color-grey-light-1;
     grid-area: detail;
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+    font-size: inherit;
+    display: grid;
+    grid-template-columns: 2fr auto;
+    grid-template-rows: 40vh max-content max-content minmax(max-content, 30rem) minmax(min-content, 40rem) minmax(min-content, 40rem) auto;
+    grid-template-areas:
+    "img img"
+    "header header"
+    "info location"
+    "facilities location"
+    "QA QA"
+    "reviews reviews"
+    "link link"
+    ;
+
+    &__section{
+        padding: 2rem;
+        border: lightgrey 0.5px solid;
+        border-radius: 2rem;
+        margin: 1rem;
+    }
     &__img{
+        grid-area: img;
+        grid-row: 1/2;
+        grid-column: 1/4;
         width: 100%;
-        height: 40rem;
+        height: 100%;
 
         @supports(object-fit: cover){
             object-fit: cover;  
         }
     }
 
-    background-color: $color-grey-light-1;
-   
-    &__link{
-        @include label(rgb(10, 10, 124));
-        @include flex-row-c;
-        margin-left: 2rem;
-        @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){
-                
-            &::after{
-                content: "";
-                margin-left: 1rem;
-                @include icon-before-element-mask(url('../img/arrow-up-right-from-square-solid.svg'), white)
-            }    
-            }
-
-
+    &__config{
+        grid-area: config;
     }
+
+    &__facilities{
+        grid-area: facilities;
+        &__items{
+            height: 100%;
+            max-height: 30rem;
+            overflow-y: scroll;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            &-item{
+                display: flex;
+                width: fit-content;
+                padding: 0.5rem;
+                align-items: center;
+                &-icon{
+                    fill: yellowgreen;
+                    &--food{
+                        fill: $color-emphasis;
+                    }
+                }
+            }
+            &-item:not(:last-child){
+                margin-right: 1.6rem;
+            }
+        }
+    }
+
+    &__cusReviews{
+        grid-area: reviews;
+        max-height: 40rem;
+        overflow-y: scroll;
+        &__item{
+            position: relative;
+            padding: 2rem;
+            padding-left: 4rem;
+            @include border-radius-card;
+            width: 100%;
+           
+            list-style: none;
+            display: grid;
+            grid-template-columns: minmax(8rem, 1fr) minmax(min-content, 5fr);
+            grid-template-rows: minmax(min-content, max-content) minmax(min-content, 2fr);
+            grid-template-areas: 
+            "author revHeader"
+            "author main";
+            grid-column-gap: 0.5rem;
+
+            &:not(:last-child){
+                margin-bottom: 2rem;
+            }
+            &::before{
+                content: "";
+                @include sideHighlight($color-primary)
+            }
+            &__author{
+                grid-area: author;
+                max-width: min-content;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                &__name{
+                @include title(1.6rem);
+
+                }
+            }
+            &__header{
+                padding-right: 5rem;
+                grid-area: revHeader;
+                &__title{
+                    @include title(2rem)
+                }
+                &__time{
+                    color: $font-color-light;
+                }
+            }
+            &__score{
+                grid-area: revHeader;
+                @include reviewScoreLabel(1.8rem);
+                justify-self: end;
+                height: max-content;
+             
+            }
+            &__content{
+                grid-area: main;
+                align-self: center;
+                padding: 1rem 1rem 1rem 3rem;
+                &>*{
+                    @include flex-row-c;
+                }
+                &-pro{
+                    position: relative;
+                    &--icon{
+                        fill: yellowgreen;
+                        position: absolute;
+                        left: -3rem;
+                        top: 0.2rem;
+
+                    }
+                }
+                &-con{
+                    position: relative;
+                    &--icon{
+                        fill: $color-emphasis;
+                        position: absolute;
+                        left: -3rem;
+                        top: 0.2rem;
+
+    
+                    }
+
+                }
+             
+                
+                // &>*{
+                //     @include flex-row-c;
+                //     padding: 1rem 0;
+                // }
+                // @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){         
+                //     &-pro::before{
+                //         content: "";
+                //         @include icon-before-element-mask(url('../img/face-smile-solid.svg'), yellowgreen);
+                //         }  
+                //     &-con::before{
+                //         content: "";
+                //         @include icon-before-element-mask(url('../img/face-frown-solid.svg'), orangered);
+                //             }  
+                //     }
+             
+            }
+        }
+    }
+
     &__header{
+        grid-area: header;
         display: grid;
-        grid-template-columns: 1fr 14rem;
-        grid-template-rows: minmax(max-content, 1.5fr) minmax(max-content, 1fr);
+        grid-template-columns: 1fr 10rem;
+        grid-template-rows: minmax(max-content, 1.5fr) minmax(1fr, 5rem);
         grid-template-areas: 
         "main review"
-        "address address";
+        "address price";
         align-items: center;
 
        
@@ -71,69 +251,54 @@
             &__hasBreakfast{
                 @include label(green)
 
-
             }
     
             &__hotel-name{
                 @include title(2.4rem);
                 width: 100%;
             }
-        }
-       
+        } 
         &__hotel-address{
             grid-area: address;
-            @include title(1.6rem);
-            @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){
-                
-                &::before{
-                    content: "";
-                    display: inline-block;
-                    @include icon-before-element-mask(url('../img/location-dot-solid.svg'), green)
-                }    
-                }
+            @include flex-row-c;
+           &-icon{
+               fill: green;
+           }
         }
+    }
+    &__price{
+        grid-area: price;
+        justify-self: flex-end;
+        &-icon{
+            fill: $color-emphasis;
+        }
+        @include flex-row-c;
     }
         
     &__info{
-        height: max-content;
-        &__price-total{
-            @include title(2.2rem);
+        grid-area: info;
+        &__title-icon{
+            fill: blue;
         }
-        &__price-one-night{
-            color: $font-color-light;
-        }
-      
         &__item{
             padding: 1rem 0;
             @include flex-row-c;
         }
-        @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){
-            &__title::before{
-                content: '';
-                @include icon-before-element-mask(url('../img//circle-info-solid.svg'), rgb(67, 112, 249))
-            }
+        @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){         
             &__item::before{
                 content: "";
                 @include icon-before-element-mask(url('../img/angle-right-solid.svg'), $font-color);
                 }  
             }
     }
-    
         
-        
-    
     &__review{
-        @include flex-col-c;
-        @include border-radius-card;
+        @include reviewScoreLabel(1.8rem);
         align-self: flex-start;
         justify-self: end;
-        padding: 1.5rem;
-        width: 12rem;
+        max-width: max-content;
         grid-area: review;
-        background-color: #ffffff;
-        &-score{
-            @include title(2.4rem)
-        }
+       
         &-description{
             @include title(1.2rem)
         }
@@ -141,44 +306,33 @@
     }
 
     &__nearBy{
-        display: grid;
-        grid-template-columns: minmax(max-content 1fr) minmax(max-content 1fr);
-        grid-template-rows: max-content 1fr;
-        grid-template-areas: 
-        "title title"
-        "landmark station";
-        grid-gap: 1rem;
+        grid-area: location;
+        @include flex-col-c;
+        max-width: 20rem;
+
         &-title{
-            @include flex-row-c;
-            grid-area: title;
-            @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){
-                &::before{
-                    content: "";
-                    @include icon-before-element-mask(url('../img/location-crosshairs-solid.svg'), $font-color);
-                    }
-                   
-                }
+            &-icon{
+                fill: $color-star-yellow;
+            }
+         
         }
         &-landmark{
-            &-title{
-                margin-bottom: 0.5rem;
-            }
-            grid-area: landmark;
-            display: flex;
-            flex-direction: column;
+            margin-bottom: 3rem;
+            @include flex-col-c;
 
             &-item{
-                padding: 1rem 0;
+                padding: 0.5rem;
             }
         }
         &-station{
-            max-width: 30rem;
-            grid-area: station;
+            width: 100%;
+            @include flex-col-c;
             &-item{
+                padding: 1rem;
+                width: 100%;
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 grid-template-rows: 1fr;
-                padding: 1rem 0;
                 border-bottom: $font-color-light 1px solid;
             }
             &-distance{
@@ -186,6 +340,89 @@
             }
         }
     }
+    &__FAQ{
+        grid-area: QA;
+        
+        &__sidenote{
+            color: $font-color-light;
+            @include flex-row-c;
+            &::before{
+                content: "⋇";
+                margin-right: 1rem
+            }
+        }
+        
+        &__items{
+            @include flex-col-c;
+            align-items: stretch;
+            max-height: 40rem;
+            height: max-content;
+            overflow-y: scroll;
+            
+        }
+        &__item{
+            padding: 1rem 3rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background-color: #f0eeee;
+            @include border-radius-card;
+            &:not(:last-child){
+                margin-bottom: 1rem;
+            }
+            &--time{
+                font-size: 1.4rem;
+                color: $font-color-light;
+                font-weight: 400;
+            }
+            &-icon{
+                @include icon-size-margin;
+                fill: $font-color-light;
+                position: absolute;
+                right: 2rem;
+                
+                &--close{
+                    display: none;
+                }
+            }
+            &--Q, &--Q:visited{
+                width: 100%;
+                @include title(1.6rem);
+                padding: 1.5rem;
+                padding-right: 4rem;
+                color: $font-color;
+                @include flex-row-c;
+
+            }
+            &--A{
+                max-height: 0;
+                overflow: hidden;
+                transition: all .5s;
+            }
+
+            &:target &--A{
+                padding: 2rem 0 2rem 3rem;
+                max-height: max-content;
+                position: relative;
+                &::before{
+                    content: "";
+                    @include sideHighlight($color-primary);
+                    display: block;
+                }
+
+            }
+            &:target &-icon{
+                &--open{
+                    display: none;
+                }
+                &--close{
+                    display: inline-block;
+                }
+            }
+
+        }
+    }
+
 }
 
 

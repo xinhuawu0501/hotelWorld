@@ -1,6 +1,5 @@
 import icons from "url:../img/icons.svg";
 
-console.log(icons);
 export default class View {
   _parentEl;
 
@@ -13,12 +12,11 @@ export default class View {
             </svg>
         </div>
         `;
-    console.log(this._parentEl);
-    console.log(`${this._parentEl} is rendering spinner`);
     this._parentEl.insertAdjacentHTML("afterbegin", markup);
   }
 
   clear() {
     this._parentEl.innerHTML = "";
+    console.log(this._parentEl);
   }
 }

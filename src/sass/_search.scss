@@ -1,35 +1,5 @@
 @import './base';
-@mixin flex-row-c {
-    display: flex;
-    align-items: center;
-}
-@mixin title($font-size) {
-    font-weight: 700;
-    font-size: $font-size;
-}
-@mixin icon-before-element($url) {
-    background-image: $url;
-    display: inline-block;
-    background-repeat: no-repeat;
-    background-position: center;
-    @include icon-size-margin;
-}
-@mixin icon-before-element-mask($url, $color){
-    -webkit-mask-image: $url;
-    -webkit-mask-size: contain;
-    background-color: $color;
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-position: center;
-    @include icon-size-margin;
-}
-@mixin flex-col-c {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-@mixin border-radius-card {
-    border-radius: 2rem;
-}
+
 a{
     text-decoration: none;
     &:visited{
@@ -73,7 +43,7 @@ a{
             }
             &__title{
                 grid-area: title;
-                @include title(1.2rem);
+                @include title(1.4rem);
                 align-self: flex-end;
 
 
@@ -81,38 +51,70 @@ a{
             &__address{
                 grid-area: address;
                 @include flex-row-c;
+                font-size: 1.2rem;
+                &-icon{
+                    fill: green
+                }
             }
-            &__address::before{
-                // @include icon-before-element(url('../img/location-dot-solid.svg'));
-               
-            }
+          
             &__score{
                 grid-area: score;
                 justify-self: end;
                 @include flex-row-c;
-
+                &-icon{
+                    fill: $color-star-yellow
+                }
                 
             }
-             &__score::before{
-                // @include icon-before-element(url('../img/star-solid.svg'))
-            }
-            
-            @supports ((-webkit-mask-image:url('../img/location-dot-solid.svg')) or (-webkit-mask-size: cover)){
-                &__address::before{
-             
-                    content: "";
-                    @include icon-before-element-mask(url('../img/location-dot-solid.svg'),green);
-                   
-                }
-              
-                &__score::before{
-                    content: "";
-                    @include icon-before-element-mask(url('../img/star-solid.svg'),$color-star-yellow);
-                }
-            
-            }
+           
+           
            
         }
+    }
+}
+.skeleton{
+    height: 12rem;
+    width: 100%;
+    padding: 1.5rem 2rem;
+    display: grid;
+    grid-template-columns: 5rem 1fr;
+    grid-template-areas: "img text";
+    grid-column-gap: 3rem;
+    align-items: center;
+    &-item{
+        animation: skeleton .5s infinite alternate;
+    }
+    &-img{
+        grid-area: img;
+        width: 5rem;
+        height: 5rem;
+        border-radius: 100%;
+        background-color: $color-grey-light-2;
+        margin-right: 2rem;
+    }
+    &-text{
+        grid-area: text;
+        &-item{
+            background-color: $color-grey-light-2;
+            height: 1.6rem;
+            width: 90%;
+            margin: 1rem 0 ;
+            
+        }
+        &-item:last-child{
+            width: 60%;
+        }
+    }
+}
+
+@keyframes skeleton {
+    0%{
+        background-color: $color-grey-light-2;
+
+    }
+    100%{
+        background-color: rgb(247, 247, 247);
+
     }
 }
 
