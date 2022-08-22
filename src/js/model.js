@@ -8,6 +8,7 @@ export const state = {
   totalPage: 1,
   curId: "",
   curHotel: {},
+  locale: "en-gb",
   search: {
     query: {
       location: "",
@@ -19,13 +20,18 @@ export const state = {
       checkout_date: "",
     },
     results: [],
-    language: "en",
   },
 };
 
+// export let getLocale = document.documentElement.lang;
+// console.log(getLocale);
+// getLocale = locale;
+// console.log(getLocale);
+
 export const getGeo = async function (address) {
   try {
-    const url = `https://trueway-geocoding.p.rapidapi.com/Geocode?address=${address}&language=en`;
+    const locale = state.locale;
+    const url = `https://trueway-geocoding.p.rapidapi.com/Geocode?address=${address}&language=${locale}`;
     const data = await getJSON(url, optionsForGeoCoding);
     const { lat, lng } = data.results[0].location;
     state.search.location = [lat, lng];
@@ -36,6 +42,8 @@ export const getGeo = async function (address) {
 
 export const getSearchResult = async function () {
   try {
+    const locale = state.locale;
+
     //get search query
     const query = searchView.getQuery();
     if (!query) return;
@@ -45,7 +53,7 @@ export const getSearchResult = async function () {
     await getGeo(query.location);
 
     //fetch data
-    const url = `https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=en-gb&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`;
+    const url = `https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=${locale}&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`;
     const data = await getJSON(url, options);
 
     state.search.results = data.result.map((data) => {
@@ -85,8 +93,10 @@ export const findCurHotel = () => {
 
 export const loadCurHotelPhotos = async function () {
   try {
+    const locale = state.locale;
+    console.log(locale);
     const id = state.curId;
-    const url = `https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=en-gb&hotel_id=${id}`;
+    const url = `https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=${locale}&hotel_id=${id}`;
 
     //fetch data
     const data = getJSON(url);
@@ -99,14 +109,17 @@ export const loadCurHotelPhotos = async function () {
 
 export const loadCurHotelNearbyandQA = async function () {
   try {
+    const locale = state.locale;
+    console.log(locale);
+
     const id = state.curId;
     const hightlightPromise = fetch(
-      `https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=en-gb`,
+      `https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=${locale}`,
       options
     );
 
     const questionsPromise = fetch(
-      `https://booking-com.p.rapidapi.com/v1/hotels/questions?locale=en-gb&hotel_id=${id}`,
+      `https://booking-com.p.rapidapi.com/v1/hotels/questions?locale=${locale}&hotel_id=${id}`,
       options
     );
 
@@ -139,15 +152,16 @@ export const loadCurHotelNearbyandQA = async function () {
 };
 export const loadCurHotelFacAndReviews = async function () {
   try {
+    const locale = state.locale;
     const id = state.curId;
 
     const facilitiesPromise = fetch(
-      `https://booking-com.p.rapidapi.com/v1/hotels/facilities?locale=en-gb&hotel_id=${id}`,
+      `https://booking-com.p.rapidapi.com/v1/hotels/facilities?locale=${locale}&hotel_id=${id}`,
       options
     );
 
     const reviewsPromise = fetch(
-      `https://booking-com.p.rapidapi.com/v1/hotels/reviews?sort_type=SORT_MOST_RELEVANT&locale=en-gb&hotel_id=${id}&language_filter=en-gb%2Cde%2Cfr&customer_type=solo_traveller%2Creview_category_group_of_friends`,
+      `https://booking-com.p.rapidapi.com/v1/hotels/reviews?sort_type=SORT_MOST_RELEVANT&locale=${locale}&hotel_id=${id}&language_filter=${locale}%2Cde%2Cfr&customer_type=solo_traveller%2Creview_category_group_of_friends`,
       options
     );
 

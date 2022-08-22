@@ -15,15 +15,21 @@
 
 .details__link{
     grid-area: link;
-    @include label(rgb(10, 10, 124));
-    @include flex-row-c;
-    margin-left: 4rem;
-    &:visited{
-        color: #ffffff;
+    margin: 1rem;
+    justify-self: center;
+
+    &__link-item{
+        padding: 10rem;
+        @include label($color-dark-blue);
+        @include flex-row-c;
+        &:visited{
+            color: #ffffff;
+        }
+       &-icon{
+           fill: white;
+       }
     }
-   &-icon{
-       fill: white;
-   }
+    
 }
 .details{
     grid-area: detail;
@@ -33,7 +39,7 @@
     font-size: inherit;
     display: grid;
     grid-template-columns: 2fr auto;
-    grid-template-rows: 40vh max-content max-content minmax(max-content, 30rem) minmax(min-content, 40rem) minmax(min-content, 40rem) auto;
+    grid-template-rows: 40vh max-content max-content minmax(min-content, 20rem) minmax(min-content, 40rem) minmax(min-content, 40rem) minmax(max-content, 10rem);
     grid-template-areas:
     "img img"
     "header header"
@@ -68,8 +74,10 @@
 
     &__facilities{
         grid-area: facilities;
+       &__title-icon{
+           fill: $color-dark-blue
+       }
         &__items{
-            height: 100%;
             max-height: 30rem;
             overflow-y: scroll;
             display: flex;
@@ -88,7 +96,7 @@
                 }
             }
             &-item:not(:last-child){
-                margin-right: 1.6rem;
+                margin-right: 1.4rem;
             }
         }
     }
@@ -97,6 +105,9 @@
         grid-area: reviews;
         max-height: 40rem;
         overflow-y: scroll;
+        &__title-icon{
+            fill: $color-light-blue
+        }
         &__item{
             position: relative;
             padding: 2rem;
@@ -122,7 +133,7 @@
             }
             &__author{
                 grid-area: author;
-                max-width: min-content;
+                max-width: max-content;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
@@ -201,7 +212,7 @@
     &__header{
         grid-area: header;
         display: grid;
-        grid-template-columns: 1fr 10rem;
+        grid-template-columns: 1fr minmax(10rem, max-content);
         grid-template-rows: minmax(max-content, 1.5fr) minmax(1fr, 5rem);
         grid-template-areas: 
         "main review"
@@ -247,7 +258,7 @@
     &__info{
         grid-area: info;
         &__title-icon{
-            fill: blue;
+            fill: $color-primary;
         }
         &__item{
             padding: 1rem 0;
@@ -325,7 +336,7 @@
             @include flex-col-c;
             align-items: stretch;
             max-height: 40rem;
-            height: max-content;
+            min-height: min-content;
             overflow-y: scroll;
             
         }

@@ -1106,14 +1106,18 @@ button:hover {
 }
 
 .details__link {
+  grid-area: link;
+  justify-self: center;
+  margin: 1rem;
+}
+
+.details__link__link-item {
   color: #fff;
   width: max-content;
   background-color: #0a0a7c;
   border-radius: 1rem;
-  grid-area: link;
   align-items: center;
   margin-bottom: 1rem;
-  margin-left: 4rem;
   margin-right: 1rem;
   padding: .8rem 1rem;
   font-size: 1.2rem;
@@ -1121,11 +1125,11 @@ button:hover {
   display: flex;
 }
 
-.details__link:visited {
+.details__link__link-item:visited {
   color: #fff;
 }
 
-.details__link-icon {
+.details__link__link-item-icon {
   fill: #fff;
 }
 
@@ -1136,10 +1140,10 @@ button:hover {
   grid-template: "img img" 40vh
                  "header header" max-content
                  "info location" max-content
-                 "facilities location" minmax(max-content, 30rem)
+                 "facilities location" minmax(min-content, 20rem)
                  "QA QA" minmax(min-content, 40rem)
                  "reviews reviews" minmax(min-content, 40rem)
-                 "link link"
+                 "link link" minmax(max-content, 10rem)
                  / 2fr auto;
   grid-area: detail;
   display: grid;
@@ -1173,8 +1177,11 @@ button:hover {
   grid-area: facilities;
 }
 
+.details__facilities__title-icon {
+  fill: #0a0a7c;
+}
+
 .details__facilities__items {
-  height: 100%;
   max-height: 30rem;
   flex-wrap: wrap;
   justify-content: center;
@@ -1199,13 +1206,17 @@ button:hover {
 }
 
 .details__facilities__items-item:not(:last-child) {
-  margin-right: 1.6rem;
+  margin-right: 1.4rem;
 }
 
 .details__cusReviews {
   max-height: 40rem;
   grid-area: reviews;
   overflow-y: scroll;
+}
+
+.details__cusReviews__title-icon {
+  fill: #4370f9;
 }
 
 .details__cusReviews__item {
@@ -1236,7 +1247,7 @@ button:hover {
 }
 
 .details__cusReviews__item__author {
-  max-width: min-content;
+  max-width: max-content;
   flex-direction: column;
   grid-area: author;
   justify-content: center;
@@ -1315,7 +1326,7 @@ button:hover {
 
 .details__header {
   grid-area: header;
-  grid-template-columns: 1fr 10rem;
+  grid-template-columns: 1fr minmax(10rem, max-content);
   grid-template-rows: minmax(max-content, 1.5fr) minmax(1fr, 5rem);
   grid-template-areas: "main review"
                        "address price";
@@ -1385,7 +1396,7 @@ button:hover {
 }
 
 .details__info__title-icon {
-  fill: #00f;
+  fill: #f38e82;
 }
 
 .details__info__item {
@@ -1491,7 +1502,7 @@ button:hover {
 
 .details__FAQ__items {
   max-height: 40rem;
-  height: max-content;
+  min-height: min-content;
   flex-direction: column;
   align-items: stretch;
   display: flex;

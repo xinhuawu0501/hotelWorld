@@ -2,10 +2,15 @@ import { now } from "../js/helper.js";
 class SearchView {
   _parentEl = document.querySelector(".search");
 
+  _setDatePickerDate() {
+    //set check-in date default to today
+    document.getElementById("check-in-date").value = now;
+  }
   getQuery() {
     const result = this._parentEl.elements;
-    const checkInDate = new Date(result[5].value).toLocaleDateString();
-    const checkOutDate = new Date(result[6].value).toLocaleDateString();
+    console.log(result[5].value, result[6].value);
+    const checkInDate = new Date(result[5].value).toISOString().split("T")[0];
+    const checkOutDate = new Date(result[6].value).toISOString().split("T")[0];
     //check total guest>0 && room number > 0
     if (!+result[2].value && !+result[3].value) {
       alert("Total number of guest should be greater than 0");
@@ -17,13 +22,18 @@ class SearchView {
     }
 
     if (checkInDate > checkOutDate) {
-      alert("Checkout date cannot be earlier than check-in date");
+      alert("Check-out date cannot be earlier than check-in date");
       return;
     }
     if (checkInDate < now) {
       alert("Check-in cannot be earlier than current date");
       return;
     }
+    if (checkInDate === checkOutDate) {
+      alert("Cannot stay less than one night");
+      return;
+    }
+    console.log(result[5].value, result[6].value);
     return {
       location: result[0].value.toLowerCase(),
       order_by: result[1].value.toLowerCase(),
@@ -38,7 +48,9 @@ class SearchView {
   addHandler(handler) {
     this._parentEl.addEventListener("submit", (e) => {
       e.preventDefault();
-
+      // for (const inputField of e.target) {
+      //   inputField.value = "";
+      // }
       handler();
     });
   }

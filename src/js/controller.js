@@ -4,6 +4,7 @@ import searchView from "../view/searchView.js";
 import previewView from "../view/previewView.js";
 import resultView from "../view/resultView.js";
 import paginationView from "../view/paginationView.js";
+import { now } from "./helper.js";
 const controlSearch = async function () {
   try {
     //skeleton loading
@@ -41,6 +42,7 @@ const controlPagination = (goTo) => {
 };
 
 const init = () => {
+  // searchView._setDatePickerDate();
   searchView.addHandler(controlSearch);
   previewView._addHandler(controlResult);
   paginationView._addHandler(controlPagination);
