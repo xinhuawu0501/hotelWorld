@@ -1,8 +1,25 @@
+import { options } from "./config";
+
 export const timeOut = async function () {
   return new Promise(function (_, reject) {
     setTimeout(() => {
       reject(new Error("Response took too long! Please try again!"));
-      console.log("rejected");
     }, "8000");
   });
+};
+export const now = new Date().toLocaleDateString();
+
+export const getJSON = async function (url, option) {
+  try {
+    const res = await fetch(url, option);
+    const timeOutRes = timeOut();
+    const raceResult = await Promise.race([res, timeOutRes]);
+    if (!raceResult.ok) throw new Error();
+
+    const data = await raceResult.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    throw new Error(error.message);
+  }
 };

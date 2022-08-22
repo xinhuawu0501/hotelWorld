@@ -12,7 +12,9 @@ const controlSearch = async function () {
 
     //render preview
     previewView._render(model.getResultPerPage(model.state.page));
+
     //pagination
+    if (!model.state.search.results[0]) return;
     paginationView._render(model.state.page, model.state);
   } catch (err) {
     alert(err);
@@ -27,6 +29,7 @@ const controlResult = async function () {
   //load hotel details using on hotel id
   await model.loadCurHotelFacAndReviews();
   await model.loadCurHotelNearbyandQA();
+  //display data
   resultView._render(model.state.curHotel);
 };
 
@@ -41,9 +44,5 @@ const init = () => {
   searchView.addHandler(controlSearch);
   previewView._addHandler(controlResult);
   paginationView._addHandler(controlPagination);
-  document.querySelector("a").addEventListener("click", (e) => {
-    e.preventDefault();
-    return false;
-  });
 };
 init();

@@ -551,6 +551,7 @@ const controlSearch = async function() {
         //render preview
         (0, _previewViewJsDefault.default)._render(_modelJs.getResultPerPage(_modelJs.state.page));
         //pagination
+        if (!_modelJs.state.search.results[0]) return;
         (0, _paginationViewJsDefault.default)._render(_modelJs.state.page, _modelJs.state);
     } catch (err) {
         alert(err);
@@ -564,6 +565,7 @@ const controlResult = async function() {
     //load hotel details using on hotel id
     await _modelJs.loadCurHotelFacAndReviews();
     await _modelJs.loadCurHotelNearbyandQA();
+    //display data
     (0, _resultViewJsDefault.default)._render(_modelJs.state.curHotel);
 };
 const controlPagination = (goTo)=>{
@@ -576,10 +578,6 @@ const init = ()=>{
     (0, _searchViewJsDefault.default).addHandler(controlSearch);
     (0, _previewViewJsDefault.default)._addHandler(controlResult);
     (0, _paginationViewJsDefault.default)._addHandler(controlPagination);
-    document.querySelector("a").addEventListener("click", (e)=>{
-        e.preventDefault();
-        return false;
-    });
 };
 init();
 
@@ -655,7 +653,7 @@ var _searchView = require("../view/searchView");
 var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
 var _helperJs = require("./helper.js");
 const state = {
-    test_id: 1377073,
+    // test_id: 1377073,
     filters: {},
     page: 1,
     totalPage: 1,
@@ -677,9 +675,8 @@ const state = {
 };
 const getGeo = async function(address) {
     try {
-        const res = await fetch(`https://trueway-geocoding.p.rapidapi.com/Geocode?address=${address}&language=en`, (0, _config.optionsForGeoCoding));
-        const data = await res.json();
-        console.log(data);
+        const url = `https://trueway-geocoding.p.rapidapi.com/Geocode?address=${address}&language=en`;
+        const data = await (0, _helperJs.getJSON)(url, (0, _config.optionsForGeoCoding));
         const { lat , lng  } = data.results[0].location;
         state.search.location = [
             lat,
@@ -695,19 +692,12 @@ const getSearchResult = async function() {
         const query = (0, _searchViewDefault.default).getQuery();
         if (!query) return;
         state.search.query = query;
+        console.log(query);
         //search location
         await getGeo(query.location);
         //fetch data
-        const searchHotelResPromise = await fetch(`https://${(0, _config.options).headers["X-RapidAPI-Host"]}/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=en-gb&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`, (0, _config.options));
-        const timeOutRes = (0, _helperJs.timeOut)();
-        const res = await Promise.race([
-            searchHotelResPromise,
-            timeOutRes
-        ]);
-        console.log(res);
-        if (!res.ok) throw new Error(`Something went wrong:( Please try again!`);
-        const data = await res.json();
-        console.log(data);
+        const url = `https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=en-gb&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`;
+        const data = await (0, _helperJs.getJSON)(url, (0, _config.options));
         state.search.results = data.result.map((data)=>{
             return {
                 hotel_name: data.hotel_name,
@@ -729,13 +719,12 @@ const getSearchResult = async function() {
                 unit_config: data.unit_configuration_label,
                 totalPrice: data.composite_price_breakdown.gross_amount.value,
                 currency: data.currency_code,
-                // pricePerNight:
-                //   data.composite_price_breakdown.gross_amount_per_night.value,
                 bookmarked: "false"
             };
         });
         //update total page
         state.totalPage = Math.ceil(state.search.results.length / (0, _config.NUM_PER_PAGE));
+        console.log(state);
     } catch (err) {
         console.error(err);
     }
@@ -749,11 +738,11 @@ const findCurHotel = ()=>{
 const loadCurHotelPhotos = async function() {
     try {
         const id = state.curId;
-        const res = await fetch(`https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=en-gb&hotel_id=${id}`, (0, _config.options));
-        if (!res.ok) throw new Error("Failed to get photo:(");
-        const data = await res.json();
+        const url = `https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=en-gb&hotel_id=${id}`;
+        //fetch data
+        const data = (0, _helperJs.getJSON)(url);
+        //set state
         state.curHotel.allPhotos = data;
-        console.log(data);
     } catch (error) {
         console.log(error);
     }
@@ -767,6 +756,7 @@ const loadCurHotelNearbyandQA = async function() {
             hightlightPromise,
             questionsPromise
         ]);
+        console.log(res);
         //error handling
         if (!res[0].value.ok) throw new Error(`Fail to load location highlight data`);
         if (!res[1].value.ok) throw new Error(`Fail to load QA data`);
@@ -775,7 +765,6 @@ const loadCurHotelNearbyandQA = async function() {
             res[0].value.json(),
             res[1].value.json(), 
         ]);
-        console.log(data);
         //location highlight data
         const landmark = data[0].value.location_highlights.popular_landmarks;
         const nearByStation = data[0].value.location_highlights.nearby_stations;
@@ -784,7 +773,6 @@ const loadCurHotelNearbyandQA = async function() {
         // //question data
         const questions = data[1].value;
         state.curHotel.FAQ = questions;
-        console.log(state.curHotel);
     } catch (err) {
         alert(err);
         console.log(err);
@@ -807,7 +795,6 @@ const loadCurHotelFacAndReviews = async function() {
             res[0].value.json(),
             res[1].value.json(), 
         ]);
-        console.log(data);
         //facilities
         state.curHotel.facilities = data[0].value;
         //reviews
@@ -825,7 +812,6 @@ const loadCurHotelFacAndReviews = async function() {
                 id: r.review_id
             };
         });
-        console.log(state.curHotel);
     } catch (err) {
         alert(err);
         console.log(err);
@@ -841,17 +827,13 @@ const getResultPerPage = (page)=>{
 },{"./config":"k5Hzs","../view/searchView":"b2EbH","./helper.js":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"b2EbH":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _configJs = require("../js/config.js");
+var _helperJs = require("../js/helper.js");
 class SearchView {
     _parentEl = document.querySelector(".search");
     getQuery() {
         const result = this._parentEl.elements;
-        //check input field empty
-        //city empty
-        if (!result[0].value) {
-            alert("Input city cannot be empty");
-            return;
-        }
+        const checkInDate = new Date(result[5].value).toLocaleDateString();
+        const checkOutDate = new Date(result[6].value).toLocaleDateString();
         //check total guest>0 && room number > 0
         if (!+result[2].value && !+result[3].value) {
             alert("Total number of guest should be greater than 0");
@@ -861,14 +843,12 @@ class SearchView {
             alert("Total number of room should be greater than 0");
             return;
         }
-        //checkin date empty || checkout date empty
-        if (!result[5].value || !result[6].value) {
-            alert("Checkin date and checkout date cannot be empty");
+        if (checkInDate > checkOutDate) {
+            alert("Checkout date cannot be earlier than check-in date");
             return;
         }
-        //checkout date < checkin date
-        if (+result[6].value.replaceAll("-", "") < +result[5].value.replaceAll("-", "")) {
-            alert("Checkout date cannot be earlier than checkin date");
+        if (checkInDate < (0, _helperJs.now)) {
+            alert("Check-in cannot be earlier than current date");
             return;
         }
         return {
@@ -890,20 +870,39 @@ class SearchView {
 }
 exports.default = new SearchView();
 
-},{"../js/config.js":"k5Hzs","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lVRAz":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../js/helper.js":"lVRAz"}],"lVRAz":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "timeOut", ()=>timeOut);
+parcelHelpers.export(exports, "now", ()=>now);
+parcelHelpers.export(exports, "getJSON", ()=>getJSON);
+var _config = require("./config");
 const timeOut = async function() {
     return new Promise(function(_, reject) {
         setTimeout(()=>{
             reject(new Error("Response took too long! Please try again!"));
-            console.log("rejected");
         }, "8000");
     });
 };
+const now = new Date().toLocaleDateString();
+const getJSON = async function(url, option) {
+    try {
+        const res = await fetch(url, option);
+        const timeOutRes = timeOut();
+        const raceResult = await Promise.race([
+            res,
+            timeOutRes
+        ]);
+        if (!raceResult.ok) throw new Error();
+        const data = await raceResult.json();
+        return data;
+    } catch (error) {
+        console.log(error);
+        throw new Error(error.message);
+    }
+};
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fFeKs":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./config":"k5Hzs"}],"fFeKs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _modelJs = require("../js/model.js");
@@ -960,8 +959,6 @@ class PreviewView extends (0, _viewJsDefault.default) {
     }
     _addHandler(handler) {
         this._parentEl.addEventListener("click", (e)=>{
-            // const id = window.location.hash.slice(1);
-            // if (typeof id !== "number") return;
             const targetPreview = e.target.closest(".preview");
             const id = targetPreview.getAttribute("id");
             _modelJs.state.curId = id;
@@ -991,7 +988,6 @@ class View {
     }
     clear() {
         this._parentEl.innerHTML = "";
-        console.log(this._parentEl);
     }
 }
 exports.default = View;

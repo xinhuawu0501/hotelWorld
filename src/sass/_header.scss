@@ -1,7 +1,7 @@
 @import './base';
 .header{
     grid-area: head;
-
+    @include box-shadow;
     .search{
         display: flex;
         flex-wrap: wrap;
@@ -10,17 +10,12 @@
         padding: 2rem 5rem;
         height: 100%;
 
-        &__btn{
-         
-            padding: 0.5rem 1.5rem;
-            margin-left: 1rem;
-            
+        &>*{
+            margin: 0 2rem 1rem 0;
+          
         }
-
         &__input-item{
-            display: flex;
-            align-items: center;
-            margin-right: 1.5rem;
+            @include flex-row-c;
         }
 
         label{
@@ -31,21 +26,19 @@
             border-radius: 2rem;
             height: 4rem;
             padding: 1rem;
+            &[type="text"]{
+                padding: 1rem 3rem;
+            }
+            &[type='number']{
+                width: 6rem
+            }
+         
         }
         select{
             display: flex;
             padding: 1rem;
             background-color: $color-grey-light-1;
             border-radius: 2rem;
-
-        }
-
-        input[type='number']{
-            width: 6rem
-        }
-
-        &__icon{
-            @include icon-size-margin;
 
         }
     }

@@ -48,6 +48,40 @@ $bp-smallest: 31.25em; // 500px
 @mixin border-radius-card {
   border-radius: 1.5rem;
 }
+@mixin box-shadow {
+  box-shadow: 0 1rem 1rem #61555117 ;
+}
+@mixin label($color) {
+  background-color: $color;
+  border-radius: 1rem;
+  @include title(1.2rem);
+  padding: 0.8rem 1rem;
+  color: #ffffff;
+  width: max-content;
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+@mixin reviewScoreLabel($font-size) {
+  border-radius: 1rem;
+  @include title($font-size);
+  color: #ffffff;
+  background-color: rgb(29, 29, 117);
+  @include flex-col-c;
+  justify-content: center;
+  min-width: min-content;
+  max-height: 12rem;
+  padding: 1rem;
+
+}
+@mixin sideHighlight($bg-color) {
+  width: 1.5rem;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: $bg-color;
+
+}
 * {
   margin: 0;
   padding: 0;

@@ -17,6 +17,5 @@ export default class View {
 
   clear() {
     this._parentEl.innerHTML = "";
-    console.log(this._parentEl);
   }
 }

@@ -60,8 +60,6 @@ class PreviewView extends View {
 
   _addHandler(handler) {
     this._parentEl.addEventListener("click", (e) => {
-      // const id = window.location.hash.slice(1);
-      // if (typeof id !== "number") return;
       const targetPreview = e.target.closest(".preview");
       const id = targetPreview.getAttribute("id");
       model.state.curId = id;

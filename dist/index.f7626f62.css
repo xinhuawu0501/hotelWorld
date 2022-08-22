@@ -102,6 +102,7 @@ body {
 
 .header {
   grid-area: head;
+  box-shadow: 0 1rem 1rem #61555117;
 }
 
 .header .search {
@@ -112,14 +113,12 @@ body {
   display: flex;
 }
 
-.header .search__btn {
-  margin-left: 1rem;
-  padding: .5rem 1.5rem;
+.header .search > * {
+  margin: 0 2rem 1rem 0;
 }
 
 .header .search__input-item {
   align-items: center;
-  margin-right: 1.5rem;
   display: flex;
 }
 
@@ -134,21 +133,19 @@ body {
   padding: 1rem;
 }
 
-.header .search select {
-  background-color: #f9f5f3;
-  border-radius: 2rem;
-  padding: 1rem;
-  display: flex;
+.header .search input[type="text"] {
+  padding: 1rem 3rem;
 }
 
 .header .search input[type="number"] {
   width: 6rem;
 }
 
-.header .search__icon {
-  height: 2rem;
-  width: 2rem;
-  margin-right: .5rem;
+.header .search select {
+  background-color: #f9f5f3;
+  border-radius: 2rem;
+  padding: 1rem;
+  display: flex;
 }
 
 * {
@@ -1136,7 +1133,6 @@ button:hover {
   height: 100%;
   width: 100%;
   font-size: inherit;
-  background-color: #f9f5f3;
   grid-template: "img img" 40vh
                  "header header" max-content
                  "info location" max-content
