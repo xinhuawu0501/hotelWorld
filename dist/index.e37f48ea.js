@@ -560,14 +560,20 @@ const controlSearch = async function() {
     }
 };
 const controlResult = async function() {
-    (0, _resultViewJsDefault.default).renderSpinner();
-    //find current hotel when user click preview
-    _modelJs.findCurHotel();
-    //load hotel details using on hotel id
-    await _modelJs.loadCurHotelFacAndReviews();
-    await _modelJs.loadCurHotelNearbyandQA();
-    //display data
-    (0, _resultViewJsDefault.default)._render(_modelJs.state.curHotel);
+    try {
+        (0, _resultViewJsDefault.default).renderSpinner();
+        //find current hotel when user click preview
+        _modelJs.findCurHotel();
+        //load hotel details using on hotel id
+        await _modelJs.loadCurHotelPhotos();
+        await _modelJs.loadCurHotelFacAndReviews();
+        await _modelJs.loadCurHotelNearbyandQA();
+        //display data
+        (0, _resultViewJsDefault.default)._render(_modelJs.state.curHotel);
+        (0, _resultViewJsDefault.default)._openModal();
+    } catch (error) {
+        alert(error);
+    }
 };
 const controlPagination = (goTo)=>{
     //update preview list
@@ -576,25 +582,24 @@ const controlPagination = (goTo)=>{
     (0, _paginationViewJsDefault.default)._render(goTo, _modelJs.state);
 };
 const init = ()=>{
-    // searchView._setDatePickerDate();
     (0, _searchViewJsDefault.default).addHandler(controlSearch);
     (0, _previewViewJsDefault.default)._addHandler(controlResult);
     (0, _paginationViewJsDefault.default)._addHandler(controlPagination);
 };
 init();
 
-},{"./config.js":"k5Hzs","./model.js":"Y4A21","../view/searchView.js":"b2EbH","../view/previewView.js":"fFeKs","../view/resultView.js":"LyN8l","../view/paginationView.js":"0EmXV","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./helper.js":"lVRAz"}],"k5Hzs":[function(require,module,exports) {
+},{"./config.js":"k5Hzs","./model.js":"Y4A21","../view/searchView.js":"b2EbH","../view/previewView.js":"fFeKs","../view/resultView.js":"LyN8l","../view/paginationView.js":"0EmXV","./helper.js":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "API_KEY", ()=>API_KEY);
 parcelHelpers.export(exports, "options", ()=>options);
 parcelHelpers.export(exports, "optionsForGeoCoding", ()=>optionsForGeoCoding);
 parcelHelpers.export(exports, "NUM_PER_PAGE", ()=>NUM_PER_PAGE);
-const API_KEY = "8212341a06msh116c63045407b15p1bffecjsn3f8fe6a12567";
+const API_KEY = "f66a571a87msh5e5cfd9538664d8p18bccfjsneb3752d5ac69";
 const options = {
     method: "GET",
     headers: {
-        "X-RapidAPI-Key": "7a98e88db5msh5087ec2115eb42bp16889cjsnc4301d679489",
+        "X-RapidAPI-Key": API_KEY,
         "X-RapidAPI-Host": "booking-com.p.rapidapi.com"
     }
 };
@@ -608,6 +613,7 @@ const optionsForGeoCoding = {
 const NUM_PER_PAGE = 12; // "X-RapidAPI-Key": "8212341a06msh116c63045407b15p1bffecjsn3f8fe6a12567",
  //7a98e88db5msh5087ec2115eb42bp16889cjsnc4301d679489
  //"Access-Control-Allow-Origin": "*",
+ //f66a571a87msh5e5cfd9538664d8p18bccfjsneb3752d5ac69
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -655,7 +661,7 @@ var _searchView = require("../view/searchView");
 var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
 var _helperJs = require("./helper.js");
 const state = {
-    // test_id: 1377073,
+    test_id: 1377073,
     filters: {},
     page: 1,
     totalPage: 1,
@@ -744,11 +750,20 @@ const loadCurHotelPhotos = async function() {
         const locale = state.locale;
         console.log(locale);
         const id = state.curId;
+        // const id = state.test_id;
         const url = `https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=${locale}&hotel_id=${id}`;
         //fetch data
-        const data = (0, _helperJs.getJSON)(url);
+        const data = await (0, _helperJs.getJSON)(url, (0, _config.options));
         //set state
-        state.curHotel.allPhotos = data;
+        state.curHotel.allPhotos = data.map((data)=>{
+            return {
+                photo_1440: data.url_1440,
+                photo_1280: data.url_max,
+                photo_square_60: data.url_square60,
+                tags: data.tags
+            };
+        });
+        console.log(state);
     } catch (error) {
         console.log(error);
     }
@@ -756,7 +771,6 @@ const loadCurHotelPhotos = async function() {
 const loadCurHotelNearbyandQA = async function() {
     try {
         const locale = state.locale;
-        console.log(locale);
         const id = state.curId;
         const hightlightPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=${locale}`, (0, _config.options));
         const questionsPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/questions?locale=${locale}&hotel_id=${id}`, (0, _config.options));
@@ -1063,9 +1077,53 @@ var _viewDefault = parcelHelpers.interopDefault(_view);
 class ResultView extends (0, _viewDefault.default) {
     _parentEl = document.querySelector(".details");
     _data;
+    _openModal() {
+        this._parentEl.addEventListener("click", (e)=>{
+            if (e.target.getAttribute("id") === "photo-3") {
+                document.querySelector(".overlay").classList.remove("hidden");
+                document.querySelector(".modal-gallery").classList.remove("hidden");
+            }
+            if (e.target.classList.contains("modal-gallery-icon--close")) {
+                document.querySelector(".overlay").classList.add("hidden");
+                document.querySelector(".modal-gallery").classList.add("hidden");
+            }
+        });
+    }
     _generateMarkup(data) {
         return `
-        <img class="details__img" src="${data.max_photo}" alt="Hotel photo">
+        <div class="details__gallery">
+          <figure class="details__gallery__photo" id="photo-1" >
+            <img src="${data.allPhotos[0].photo_1280}" alt="Main photo">
+          </figure>
+          <figure class="details__gallery__photo" id="photo-2" >
+            <img src="${data.allPhotos[1].photo_1280}" alt="Photo-2">
+          </figure>
+          <figure class="details__gallery__photo" id="photo-3" data-open-all="See all ${data.allPhotos.length} photos">
+            <img src="${data.allPhotos[2].photo_1280}" alt="Photo-3">
+          </figure>
+        </div>
+
+        <div class="modal modal-gallery hidden">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon modal-icon modal-gallery-icon--close"
+            viewBox="0 0 320 512"
+          >
+            <!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. -->
+            <path
+              d="M310.6 361.4c12.5 12.5 12.5 32.75 0 45.25C304.4 412.9 296.2 416 288 416s-16.38-3.125-22.62-9.375L160 301.3L54.63 406.6C48.38 412.9 40.19 416 32 416S15.63 412.9 9.375 406.6c-12.5-12.5-12.5-32.75 0-45.25l105.4-105.4L9.375 150.6c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L160 210.8l105.4-105.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-105.4 105.4L310.6 361.4z"
+            />
+          </svg>
+          <div class="modal-gallery__main">
+          ${data.allPhotos.map((photo)=>{
+            return `
+            <figure class="modal-gallery__main-photo" data-tag="${photo.tags[0] ? photo.tags[0].tag : ""}">
+              <img src="${photo.photo_1280}" >
+            </figure>`;
+        }).join("")}
+          </div>
+        </div>
+
         <div class="details__header details__section">
           <div class="details__header-main">
           ${data.free_cancellable === 1 ? '<div class="details__header-main__isFreeCancellable">Free cancellable</div>' : ""}

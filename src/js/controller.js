@@ -24,14 +24,20 @@ const controlSearch = async function () {
 };
 
 const controlResult = async function () {
-  resultView.renderSpinner();
-  //find current hotel when user click preview
-  model.findCurHotel();
-  //load hotel details using on hotel id
-  await model.loadCurHotelFacAndReviews();
-  await model.loadCurHotelNearbyandQA();
-  //display data
-  resultView._render(model.state.curHotel);
+  try {
+    resultView.renderSpinner();
+    //find current hotel when user click preview
+    model.findCurHotel();
+    //load hotel details using on hotel id
+    await model.loadCurHotelPhotos();
+    await model.loadCurHotelFacAndReviews();
+    await model.loadCurHotelNearbyandQA();
+    //display data
+    resultView._render(model.state.curHotel);
+    resultView._openModal();
+  } catch (error) {
+    alert(error);
+  }
 };
 
 const controlPagination = (goTo) => {
@@ -42,7 +48,6 @@ const controlPagination = (goTo) => {
 };
 
 const init = () => {
-  // searchView._setDatePickerDate();
   searchView.addHandler(controlSearch);
   previewView._addHandler(controlResult);
   paginationView._addHandler(controlPagination);

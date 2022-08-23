@@ -2,7 +2,7 @@ import { options, optionsForGeoCoding, NUM_PER_PAGE } from "./config";
 import searchView from "../view/searchView";
 import { getJSON, timeOut } from "./helper.js";
 export const state = {
-  // test_id: 1377073,
+  test_id: 1377073,
   filters: {},
   page: 1,
   totalPage: 1,
@@ -96,21 +96,32 @@ export const loadCurHotelPhotos = async function () {
     const locale = state.locale;
     console.log(locale);
     const id = state.curId;
+    // const id = state.test_id;
+
     const url = `https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=${locale}&hotel_id=${id}`;
 
     //fetch data
-    const data = getJSON(url);
+    const data = await getJSON(url, options);
     //set state
-    state.curHotel.allPhotos = data;
+    state.curHotel.allPhotos = data.map((data) => {
+      return {
+        photo_1440: data.url_1440,
+        photo_1280: data.url_max,
+        photo_square_60: data.url_square60,
+        tags: data.tags, //[{tag: '', id: 123}, {...}]
+      };
+    });
+    console.log(state);
   } catch (error) {
     console.log(error);
   }
 };
 
+// loadCurHotelPhotos();
+
 export const loadCurHotelNearbyandQA = async function () {
   try {
     const locale = state.locale;
-    console.log(locale);
 
     const id = state.curId;
     const hightlightPromise = fetch(

@@ -2,16 +2,6 @@
 @import './base';
 @import './components';
 
-.main-title{
-    @include title(2rem);
-    @include flex-row-c;
-    margin-bottom: 2rem;
-
-}
-.sub-title{
-    @include title(1.8rem);
-    margin-bottom: 1.6rem;
-}
 
 .details__link{
     grid-area: link;
@@ -38,8 +28,8 @@
     overflow-y: scroll;
     font-size: inherit;
     display: grid;
-    grid-template-columns: 2fr auto;
-    grid-template-rows: 40vh max-content max-content minmax(min-content, 20rem) minmax(min-content, 40rem) minmax(min-content, 40rem) minmax(max-content, 10rem);
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 50vh max-content max-content minmax(min-content, 20rem) minmax(min-content, 40rem) minmax(min-content, 40rem) minmax(max-content, 10rem);
     grid-template-areas:
     "img img"
     "header header"
@@ -56,16 +46,42 @@
         border-radius: 2rem;
         margin: 1rem;
     }
-    &__img{
-        grid-area: img;
-        grid-row: 1/2;
-        grid-column: 1/4;
-        width: 100%;
-        height: 100%;
+   
 
-        @supports(object-fit: cover){
-            object-fit: cover;  
+    &__gallery{
+        grid-area: img;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        #photo-1{
+            grid-column: 1/2;
+            grid-row: 1/-1;
         }
+        #photo-2{
+            grid-column: 2/-1;
+            grid-row: 1/2;
+        }
+        #photo-3{
+            grid-column: 2/-1;
+            grid-row: 2/-1;
+        }
+        &__photo{
+            overflow: hidden; 
+            position: relative;
+
+            &>*{
+                @include gallery-photo;
+                
+            }    
+            &:last-child:hover{    
+                &::after{ 
+                    @include photo-hover-content(attr(data-open-all));
+                    font-size: 2rem;
+                }
+            }             
+        }
+        
+        
     }
 
     &__config{
@@ -141,6 +157,9 @@
                 @include title(1.6rem);
 
                 }
+                &__type{
+                    color: $font-color-light;
+                }
             }
             &__header{
                 padding-right: 5rem;
@@ -166,6 +185,9 @@
                 &>*{
                     @include flex-row-c;
                 }
+                &>*:not(:last-child){
+                    margin-bottom: 0.5rem;
+                }
                 &-pro{
                     position: relative;
                     &--icon{
@@ -173,6 +195,7 @@
                         position: absolute;
                         left: -3rem;
                         top: 0.2rem;
+                        
 
                     }
                 }
@@ -189,21 +212,6 @@
 
                 }
              
-                
-                // &>*{
-                //     @include flex-row-c;
-                //     padding: 1rem 0;
-                // }
-                // @supports(-webkit-mask-image:url('../img/angle-right-solid.svg')){         
-                //     &-pro::before{
-                //         content: "";
-                //         @include icon-before-element-mask(url('../img/face-smile-solid.svg'), yellowgreen);
-                //         }  
-                //     &-con::before{
-                //         content: "";
-                //         @include icon-before-element-mask(url('../img/face-frown-solid.svg'), orangered);
-                //             }  
-                //     }
              
             }
         }
