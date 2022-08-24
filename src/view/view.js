@@ -2,6 +2,11 @@ import icons from "url:../img/icons.svg";
 
 export default class View {
   _parentEl;
+  _data;
+
+  clear() {
+    this._parentEl.innerHTML = "";
+  }
 
   renderSpinner() {
     this.clear();
@@ -15,7 +20,10 @@ export default class View {
     this._parentEl.insertAdjacentHTML("afterbegin", markup);
   }
 
-  clear() {
-    this._parentEl.innerHTML = "";
+  render(data) {
+    this.clear();
+    this._data = data;
+    const markup = this._generateMarkup(data);
+    this._parentEl.insertAdjacentHTML("afterbegin", markup);
   }
 }

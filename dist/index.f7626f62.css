@@ -162,6 +162,13 @@ body {
   top: 45%;
 }
 
+.details__fallback-message {
+  text-align: center;
+  color: #838282;
+  padding: 3rem;
+  font-size: 1.8rem;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -326,6 +333,13 @@ body {
   top: 45%;
 }
 
+.details__fallback-message {
+  text-align: center;
+  color: #838282;
+  padding: 3rem;
+  font-size: 1.8rem;
+}
+
 .header {
   grid-area: head;
   box-shadow: 0 1rem 1rem #61555117;
@@ -360,7 +374,7 @@ body {
 }
 
 .header .search input[type="text"] {
-  padding: 1rem 3rem;
+  padding: 1rem 2rem;
 }
 
 .header .search input[type="number"] {
@@ -536,6 +550,13 @@ body {
   display: flex;
   position: absolute;
   top: 45%;
+}
+
+.details__fallback-message {
+  text-align: center;
+  color: #838282;
+  padding: 3rem;
+  font-size: 1.8rem;
 }
 
 a {
@@ -826,6 +847,13 @@ body {
   top: 45%;
 }
 
+.details__fallback-message {
+  text-align: center;
+  color: #838282;
+  padding: 3rem;
+  font-size: 1.8rem;
+}
+
 a {
   text-decoration: none;
 }
@@ -1104,6 +1132,13 @@ body {
   top: 45%;
 }
 
+.details__fallback-message {
+  text-align: center;
+  color: #838282;
+  padding: 3rem;
+  font-size: 1.8rem;
+}
+
 .icon {
   height: 2rem;
   width: 2rem;
@@ -1113,6 +1148,10 @@ body {
 .spinner {
   text-align: center;
   margin: 5rem auto;
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  right: 50%;
 }
 
 .spinner svg {
@@ -1333,6 +1372,13 @@ body {
   top: 45%;
 }
 
+.details__fallback-message {
+  text-align: center;
+  color: #838282;
+  padding: 3rem;
+  font-size: 1.8rem;
+}
+
 a {
   text-decoration: none;
 }
@@ -1611,6 +1657,13 @@ body {
   top: 45%;
 }
 
+.details__fallback-message {
+  text-align: center;
+  color: #838282;
+  padding: 3rem;
+  font-size: 1.8rem;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -1773,6 +1826,13 @@ body {
   display: flex;
   position: absolute;
   top: 45%;
+}
+
+.details__fallback-message {
+  text-align: center;
+  color: #838282;
+  padding: 3rem;
+  font-size: 1.8rem;
 }
 
 a {
@@ -2051,6 +2111,13 @@ body {
   display: flex;
   position: absolute;
   top: 45%;
+}
+
+.details__fallback-message {
+  text-align: center;
+  color: #838282;
+  padding: 3rem;
+  font-size: 1.8rem;
 }
 
 .icon {
@@ -2062,6 +2129,10 @@ body {
 .spinner {
   text-align: center;
   margin: 5rem auto;
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  right: 50%;
 }
 
 .spinner svg {
@@ -2120,8 +2191,6 @@ button:hover {
   background-color: #0a0a7c;
   border-radius: 1rem;
   align-items: center;
-  margin-bottom: 1rem;
-  margin-right: 1rem;
   padding: .8rem 1rem;
   font-size: 1.2rem;
   font-weight: 700;
@@ -2136,20 +2205,44 @@ button:hover {
   fill: #fff;
 }
 
+.details__review {
+  color: #fff;
+  min-width: min-content;
+  max-height: 12rem;
+  background-color: #1d1d75;
+  border-radius: 1rem;
+  flex-direction: column;
+  grid-area: review;
+  justify-content: center;
+  place-self: flex-start end;
+  align-items: center;
+  padding: 1rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  display: flex;
+}
+
+.details__review-description {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
 .details {
   height: 100%;
   width: 100%;
   font-size: inherit;
-  grid-template: "img img" 50vh
-                 "header header" max-content
-                 "info location" max-content
-                 "facilities location" minmax(min-content, 20rem)
-                 "QA QA" minmax(min-content, 40rem)
-                 "reviews reviews" minmax(min-content, 40rem)
-                 "link link" minmax(max-content, 10rem)
-                 / 2fr 1fr;
   grid-area: detail;
+  grid-template-columns: 2fr minmax(1fr, 25rem);
+  grid-template-rows: 50vh max-content max-content minmax(min-content, 20rem) minmax(min-content, 1fr) minmax(min-content, 40rem) minmax(max-content, 10rem);
+  grid-template-areas: "img img"
+                       "header header"
+                       "info location"
+                       "facilities location"
+                       "QA QA"
+                       "reviews reviews"
+                       "link link";
   display: grid;
+  position: relative;
   overflow-y: scroll;
 }
 
@@ -2309,6 +2402,17 @@ button:hover {
   color: #838282;
 }
 
+.details__cusReviews__item__author__purpose {
+  color: #fff;
+  width: max-content;
+  background-color: #4370f9;
+  border-radius: 1rem;
+  margin-top: 1rem;
+  padding: .8rem 1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
 .details__cusReviews__item__header {
   grid-area: revHeader;
   padding-right: 5rem;
@@ -2399,8 +2503,7 @@ button:hover {
   width: max-content;
   background-color: #4370f9;
   border-radius: 1rem;
-  margin-bottom: 1rem;
-  margin-right: 1rem;
+  margin: 0 1rem 1rem 0;
   padding: .8rem 1rem;
   font-size: 1.2rem;
   font-weight: 700;
@@ -2411,8 +2514,7 @@ button:hover {
   width: max-content;
   background-color: green;
   border-radius: 1rem;
-  margin-bottom: 1rem;
-  margin-right: 1rem;
+  margin: 0 1rem 1rem 0;
   padding: .8rem 1rem;
   font-size: 1.2rem;
   font-weight: 700;
@@ -2473,31 +2575,9 @@ button:hover {
   }
 }
 
-.details__review {
-  color: #fff;
-  min-width: min-content;
-  max-height: 12rem;
-  max-width: max-content;
-  background-color: #1d1d75;
-  border-radius: 1rem;
-  flex-direction: column;
-  grid-area: review;
-  justify-content: center;
-  place-self: flex-start end;
-  align-items: center;
-  padding: 1rem;
-  font-size: 1.8rem;
-  font-weight: 700;
-  display: flex;
-}
-
-.details__review-description {
-  font-size: 1.2rem;
-  font-weight: 700;
-}
-
 .details__nearBy {
-  max-width: 20rem;
+  width: max-content;
+  max-width: 25rem;
   flex-direction: column;
   grid-area: location;
   align-items: center;
@@ -2516,7 +2596,8 @@ button:hover {
 }
 
 .details__nearBy-landmark-item {
-  padding: .5rem;
+  text-align: center;
+  padding: 1rem 0;
 }
 
 .details__nearBy-station {
@@ -2531,7 +2612,7 @@ button:hover {
   border-bottom: 1px solid #838282;
   grid-template-rows: 1fr;
   grid-template-columns: 1fr 1fr;
-  padding: 1rem;
+  padding: 1rem 0;
   display: grid;
 }
 
@@ -2546,6 +2627,7 @@ button:hover {
 .details__FAQ__sidenote {
   color: #838282;
   align-items: center;
+  margin-bottom: 1.6rem;
   display: flex;
 }
 

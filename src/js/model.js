@@ -37,6 +37,7 @@ export const getGeo = async function (address) {
     state.search.location = [lat, lng];
   } catch (err) {
     console.error(err);
+    alert("Please enter valid location!");
   }
 };
 
@@ -56,6 +57,7 @@ export const getSearchResult = async function () {
     const url = `https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=${locale}&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`;
     const data = await getJSON(url, options);
 
+    console.log(data);
     state.search.results = data.result.map((data) => {
       return {
         hotel_name: data.hotel_name,
@@ -71,7 +73,7 @@ export const getSearchResult = async function () {
         review: [data.review_score, data.review_score_word, data.review_nr],
         url: data.url,
         unit_config: data.unit_configuration_label,
-        totalPrice: data.composite_price_breakdown.gross_amount.value,
+        totalPrice: data.composite_price_breakdown.all_inclusive_amount.value,
         currency: data.currency_code,
         bookmarked: "false",
       };
@@ -124,6 +126,7 @@ export const loadCurHotelNearbyandQA = async function () {
     const locale = state.locale;
 
     const id = state.curId;
+    // const id = state.test_id;
     const hightlightPromise = fetch(
       `https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=${locale}`,
       options
@@ -155,12 +158,20 @@ export const loadCurHotelNearbyandQA = async function () {
 
     // //question data
     const questions = data[1].value;
+    console.log(questions);
+
+    questions.q_and_a_pairs = data[1].value.q_and_a_pairs.filter((qa) => {
+      return qa.answer;
+    });
+    console.log(questions);
+
     state.curHotel.FAQ = questions;
   } catch (err) {
     alert(err);
     console.log(err);
   }
 };
+// loadCurHotelNearbyandQA();
 export const loadCurHotelFacAndReviews = async function () {
   try {
     const locale = state.locale;

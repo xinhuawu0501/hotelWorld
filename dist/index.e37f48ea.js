@@ -569,17 +569,22 @@ const controlResult = async function() {
         await _modelJs.loadCurHotelFacAndReviews();
         await _modelJs.loadCurHotelNearbyandQA();
         //display data
-        (0, _resultViewJsDefault.default)._render(_modelJs.state.curHotel);
-        (0, _resultViewJsDefault.default)._openModal();
+        (0, _resultViewJsDefault.default).render(_modelJs.state.curHotel);
+        (0, _resultViewJsDefault.default)._toggleModal();
+    // document
+    //   .querySelector(".details__FAQ__item--Q")
+    //   .addEventListener("click", (e) => {
+    //     e.preventDefault();
+    //   });
     } catch (error) {
         alert(error);
     }
 };
 const controlPagination = (goTo)=>{
     //update preview list
-    (0, _previewViewJsDefault.default)._render(_modelJs.getResultPerPage(goTo));
+    (0, _previewViewJsDefault.default).render(_modelJs.getResultPerPage(goTo));
     //update button
-    (0, _paginationViewJsDefault.default)._render(goTo, _modelJs.state);
+    (0, _paginationViewJsDefault.default).render(goTo, _modelJs.state);
 };
 const init = ()=>{
     (0, _searchViewJsDefault.default).addHandler(controlSearch);
@@ -693,6 +698,7 @@ const getGeo = async function(address) {
         ];
     } catch (err) {
         console.error(err);
+        alert("Please enter valid location!");
     }
 };
 const getSearchResult = async function() {
@@ -708,6 +714,7 @@ const getSearchResult = async function() {
         //fetch data
         const url = `https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=${locale}&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`;
         const data = await (0, _helperJs.getJSON)(url, (0, _config.options));
+        console.log(data);
         state.search.results = data.result.map((data)=>{
             return {
                 hotel_name: data.hotel_name,
@@ -727,7 +734,7 @@ const getSearchResult = async function() {
                 ],
                 url: data.url,
                 unit_config: data.unit_configuration_label,
-                totalPrice: data.composite_price_breakdown.gross_amount.value,
+                totalPrice: data.composite_price_breakdown.all_inclusive_amount.value,
                 currency: data.currency_code,
                 bookmarked: "false"
             };
@@ -772,6 +779,7 @@ const loadCurHotelNearbyandQA = async function() {
     try {
         const locale = state.locale;
         const id = state.curId;
+        // const id = state.test_id;
         const hightlightPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=${locale}`, (0, _config.options));
         const questionsPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/questions?locale=${locale}&hotel_id=${id}`, (0, _config.options));
         const res = await Promise.allSettled([
@@ -794,6 +802,11 @@ const loadCurHotelNearbyandQA = async function() {
         state.curHotel.nearByStation = nearByStation;
         // //question data
         const questions = data[1].value;
+        console.log(questions);
+        questions.q_and_a_pairs = data[1].value.q_and_a_pairs.filter((qa)=>{
+            return qa.answer;
+        });
+        console.log(questions);
         state.curHotel.FAQ = questions;
     } catch (err) {
         alert(err);
@@ -1012,6 +1025,10 @@ var _iconsSvg = require("url:../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class View {
     _parentEl;
+    _data;
+    clear() {
+        this._parentEl.innerHTML = "";
+    }
     renderSpinner() {
         this.clear();
         const markup = `
@@ -1023,8 +1040,11 @@ class View {
         `;
         this._parentEl.insertAdjacentHTML("afterbegin", markup);
     }
-    clear() {
-        this._parentEl.innerHTML = "";
+    render(data) {
+        this.clear();
+        this._data = data;
+        const markup = this._generateMarkup(data);
+        this._parentEl.insertAdjacentHTML("afterbegin", markup);
     }
 }
 exports.default = View;
@@ -1077,7 +1097,7 @@ var _viewDefault = parcelHelpers.interopDefault(_view);
 class ResultView extends (0, _viewDefault.default) {
     _parentEl = document.querySelector(".details");
     _data;
-    _openModal() {
+    _toggleModal() {
         this._parentEl.addEventListener("click", (e)=>{
             if (e.target.getAttribute("id") === "photo-3") {
                 document.querySelector(".overlay").classList.remove("hidden");
@@ -1185,7 +1205,7 @@ class ResultView extends (0, _viewDefault.default) {
               <div class="details__nearBy-station-distance">${s.distance_meters} m</div>
             </div>`;
         }).join(" ")}  
-      </div>` : ""}` : `<div>No location highlights for now :(</div>`}
+      </div>` : ""}` : `<div class="details__fallback-message">No location highlights for now :(</div>`}
         </div>
 
 
@@ -1193,7 +1213,7 @@ class ResultView extends (0, _viewDefault.default) {
         <h3 class="details__cusReviews__title main-title">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon details__cusReviews__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 31.1c-141.4 0-255.1 93.12-255.1 208c0 49.62 21.35 94.98 56.97 130.7c-12.5 50.37-54.27 95.27-54.77 95.77c-2.25 2.25-2.875 5.734-1.5 8.734c1.249 3 4.021 4.766 7.271 4.766c66.25 0 115.1-31.76 140.6-51.39c32.63 12.25 69.02 19.39 107.4 19.39c141.4 0 255.1-93.13 255.1-207.1S397.4 31.1 256 31.1zM127.1 271.1c-17.75 0-32-14.25-32-31.1s14.25-32 32-32s32 14.25 32 32S145.7 271.1 127.1 271.1zM256 271.1c-17.75 0-31.1-14.25-31.1-31.1s14.25-32 31.1-32s31.1 14.25 31.1 32S273.8 271.1 256 271.1zM383.1 271.1c-17.75 0-32-14.25-32-31.1s14.25-32 32-32s32 14.25 32 32S401.7 271.1 383.1 271.1z"/></svg>
         Reviews</h3>
-        ${data.customerReviews ? ` 
+        ${data.customerReviews[0] ? ` 
           ${data.customerReviews.map((c)=>{
             return ` <li class="details__cusReviews__item" id="${c.id}">
             <div class="details__cusReviews__item__author">
@@ -1218,14 +1238,14 @@ class ResultView extends (0, _viewDefault.default) {
             </div>` : ""}
             </div>
           </li>`;
-        }).join("")}` : `<div>No reviews for now :(</div>`}
+        }).join("")}` : `<div class="details__fallback-message">No reviews for now :(</div>`}
         </ul>
 
         <div class="details__facilities details__section">
             <h3 class="details__facilities__title main-title">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon details__facilities__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M480 0C497.7 0 512 14.33 512 32C512 49.67 497.7 64 480 64V448C497.7 448 512 462.3 512 480C512 497.7 497.7 512 480 512H304V448H208V512H32C14.33 512 0 497.7 0 480C0 462.3 14.33 448 32 448V64C14.33 64 0 49.67 0 32C0 14.33 14.33 0 32 0H480zM112 96C103.2 96 96 103.2 96 112V144C96 152.8 103.2 160 112 160H144C152.8 160 160 152.8 160 144V112C160 103.2 152.8 96 144 96H112zM224 144C224 152.8 231.2 160 240 160H272C280.8 160 288 152.8 288 144V112C288 103.2 280.8 96 272 96H240C231.2 96 224 103.2 224 112V144zM368 96C359.2 96 352 103.2 352 112V144C352 152.8 359.2 160 368 160H400C408.8 160 416 152.8 416 144V112C416 103.2 408.8 96 400 96H368zM96 240C96 248.8 103.2 256 112 256H144C152.8 256 160 248.8 160 240V208C160 199.2 152.8 192 144 192H112C103.2 192 96 199.2 96 208V240zM240 192C231.2 192 224 199.2 224 208V240C224 248.8 231.2 256 240 256H272C280.8 256 288 248.8 288 240V208C288 199.2 280.8 192 272 192H240zM352 240C352 248.8 359.2 256 368 256H400C408.8 256 416 248.8 416 240V208C416 199.2 408.8 192 400 192H368C359.2 192 352 199.2 352 208V240zM256 288C211.2 288 173.5 318.7 162.1 360.2C159.7 373.1 170.7 384 184 384H328C341.3 384 352.3 373.1 349 360.2C338.5 318.7 300.8 288 256 288z"/></svg>
             Facilities</h3>
-        ${data.facilities ? `
+        ${data.facilities[0] ? `
             <div class="details__facilities__items">
              ${data.facilities.map((f)=>{
             return `
@@ -1244,7 +1264,7 @@ class ResultView extends (0, _viewDefault.default) {
             FAQ</h3>
             <div class="details__FAQ__sidenote">${data.FAQ.average_response_time}</div>
           </header>
-        ${data.FAQ ? `
+        ${data.FAQ.q_and_a_pairs[0] ? `
       <div class="details__FAQ__items">
         ${data.FAQ.q_and_a_pairs.slice(0, 10).map((qa, i)=>{
             return `
@@ -1258,21 +1278,15 @@ class ResultView extends (0, _viewDefault.default) {
             </div>
           </div>`;
         }).join("")}
-      </div>` : `<div>No FAQ for now :(</div>`}
+      </div>` : `<div class="details__fallback-message">No FAQ for now :(</div>`}
         </div>
 
         <div class="details__link">
           <a href="${data.url}" class="details__link__link-item">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon details__link__link-item-icon" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 64C256 46.33 270.3 32 288 32H415.1C415.1 32 415.1 32 415.1 32C420.3 32 424.5 32.86 428.2 34.43C431.1 35.98 435.5 38.27 438.6 41.3C438.6 41.35 438.6 41.4 438.7 41.44C444.9 47.66 447.1 55.78 448 63.9C448 63.94 448 63.97 448 64V192C448 209.7 433.7 224 416 224C398.3 224 384 209.7 384 192V141.3L214.6 310.6C202.1 323.1 181.9 323.1 169.4 310.6C156.9 298.1 156.9 277.9 169.4 265.4L338.7 96H288C270.3 96 256 81.67 256 64V64zM0 128C0 92.65 28.65 64 64 64H160C177.7 64 192 78.33 192 96C192 113.7 177.7 128 160 128H64V416H352V320C352 302.3 366.3 288 384 288C401.7 288 416 302.3 416 320V416C416 451.3 387.3 480 352 480H64C28.65 480 0 451.3 0 416V128z"/></svg>
-            Visit Booking.com</a>
+            Visit Booking.com to explore more</a>
           </div>
     `;
-    }
-    _render(data) {
-        this._data = data;
-        const markup = this._generateMarkup(data);
-        this._parentEl.innerHTML = "";
-        this._parentEl.insertAdjacentHTML("afterbegin", markup);
     }
 }
 exports.default = new ResultView();

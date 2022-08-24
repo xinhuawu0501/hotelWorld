@@ -33,8 +33,13 @@ const controlResult = async function () {
     await model.loadCurHotelFacAndReviews();
     await model.loadCurHotelNearbyandQA();
     //display data
-    resultView._render(model.state.curHotel);
-    resultView._openModal();
+    resultView.render(model.state.curHotel);
+    resultView._toggleModal();
+    // document
+    //   .querySelector(".details__FAQ__item--Q")
+    //   .addEventListener("click", (e) => {
+    //     e.preventDefault();
+    //   });
   } catch (error) {
     alert(error);
   }
@@ -42,9 +47,9 @@ const controlResult = async function () {
 
 const controlPagination = (goTo) => {
   //update preview list
-  previewView._render(model.getResultPerPage(goTo));
+  previewView.render(model.getResultPerPage(goTo));
   //update button
-  paginationView._render(goTo, model.state);
+  paginationView.render(goTo, model.state);
 };
 
 const init = () => {

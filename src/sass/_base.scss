@@ -61,8 +61,7 @@ $bp-smallest: 31.25em; // 500px
   padding: 0.8rem 1rem;
   color: #ffffff;
   width: max-content;
-  margin-right: 1rem;
-  margin-bottom: 1rem;
+
 }
 @mixin reviewScoreLabel($font-size) {
   border-radius: 1rem;
@@ -246,10 +245,12 @@ body {
       grid-template-rows: repeat(auto-fit, 25rem);
       justify-content: center;
       grid-gap: 1.5rem;
+     
 
       &-photo{
         height: 25rem;
         width: 25rem;
+    
         overflow: hidden;
         position: relative;
         
@@ -259,14 +260,16 @@ body {
   
         &:hover::after{
          @include photo-hover-content(attr(data-tag));
-        }
+         
+        }   
       }
     }
-   
-    
-    
-  
-    
-  }
-  
+  } 
+}
+
+.details__fallback-message{
+  padding: 3rem;
+  text-align: center;
+  color: $font-color-light;
+  font-size: 1.8rem;
 }
