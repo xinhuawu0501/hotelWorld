@@ -7,7 +7,8 @@ a{
     }
 }
 .search-results{
-    width: 100%;
+    overflow: hidden;
+    width: min-content;
     height: 100%;
     grid-area: list;
     .results{
@@ -17,6 +18,7 @@ a{
             padding: 1.5rem 2rem;
             height: 12rem;
             &__link{
+                width: 30rem;
                 height: 100%;
                 display: grid;
                 grid-template-columns: 5rem 1fr 3.5rem;
@@ -34,10 +36,7 @@ a{
 
 
             &__fig{
-                width: 5rem;
-                height: 5rem;
-                background-color: rgb(196, 211, 211);
-                border-radius: 100%;
+                @include list-photo;
                 grid-area: img;
                 overflow: hidden;
             }
@@ -74,7 +73,7 @@ a{
 }
 .skeleton{
     height: 12rem;
-    width: 100%;
+    width: 30rem;
     padding: 1.5rem 2rem;
     display: grid;
     grid-template-columns: 5rem 1fr;
@@ -86,9 +85,7 @@ a{
     }
     &-img{
         grid-area: img;
-        width: 5rem;
-        height: 5rem;
-        border-radius: 100%;
+        @include list-photo;
         background-color: $color-grey-light-2;
         margin-right: 2rem;
     }

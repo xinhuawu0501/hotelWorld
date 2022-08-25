@@ -14,57 +14,63 @@
   </head>
   <body>
     <div class="container">
+      <nav class="nav">
+        <div class="nav__logo">HotelWorld</div>
+        <ul class="nav__list">
+          <li class="nav__item nav__item-bookmark">
+            <svg class="icon icon-bookmark nav__item-bookmark--icon">
+              <use xlink:href="/icons.21bad73c.svg#icon-bookmark-fill"></use>
+            </svg>
+            Favorites
+            <ul class="nav__item__modal nav__item__modal-bookmark"></ul>
+          </li>
+        </ul>
+      </nav>
       <header class="header">
-        <!-- <img src="src/img/logo.png" alt="Logo" class="header__logo" /> -->
         <form class="search" method="get">
-          <input type="text" name="location" class="search__field search__input-item" placeholder="Search hotel by location..." required="" oninvalid="setCustomValidity('Enter location to continue')" oninput="setCustomValidity('')">
-          <span class="search__input-item">
-            <label for="order-by">Sort by</label>
-            <select name="order-by" id="order-by">
-              <option value="popularity">Popularity</option>
-              <option value="review_score">Review score</option>
-              <option value="price">Price</option>
-            </select>
-          </span>
+          <div class="search__input__item search__input__item-text">
+            <input type="text" name="location" class="input search__input__item-text--search-field" placeholder="Search hotel by location..." required="" oninvalid="setCustomValidity('Enter location to continue')" oninput="setCustomValidity('')">
+            <span class="search__input__item-text--sort">
+              <label for="order-by">Sort by</label>
+              <select name="order-by" id="order-by" class="input">
+                <option value="popularity">Popularity</option>
+                <option value="review_score">Review score</option>
+                <option value="price">Price</option>
+              </select>
+            </span>
+          </div>
 
-          <span class="search__input-item">
-            <label for="guest__num-adult">Adult</label>
-            <input type="number" name="adult__num" class="guest__num" id="guest__num-adult" min="0" value="1" required="">
-          </span>
-          <span class="search__input-item">
-            <label for="guest__num-kid">Kid</label>
-            <input type="number" class="guest__num" name="kid__num" id="guest__num-kid" min="0" value="0" required="">
-          </span>
-          <span class="search__input-item">
-            <label for="room__num">Number of room</label>
-            <input type="number" name="room__num" class="room__num" id="room__num" min="0" value="1" required="">
-          </span>
-          <span class="search__input-item">
-            <label for="check-in-date">Check-in</label>
-            <input type="date" class="calender" name="check-in-date" id="check-in-date" required="" oninvalid="setCustomValidity('Enter check-in date to continue')" oninput="setCustomValidity('')">
-          </span>
-          <span class="search__input-item">
-            <label for="check-out-date">Check-out</label>
-            <input type="date" class="calender" name="check-out-date" id="check-out-date" required="" oninvalid="setCustomValidity('Enter check-out to continue')" oninput="setCustomValidity('')">
-          </span>
-
-          <button class="btn search__btn">
+          <div class="search__input__item search__input__item-numbers">
+            <span>
+              <label for="guest__num-adult">Adult</label>
+              <input type="number" name="adult__num" class="input guest__num" id="guest__num-adult" min="0" value="1" required="">
+            </span>
+            <span>
+              <label for="guest__num-kid">Kid</label>
+              <input type="number" class="input guest__num" name="kid__num" id="guest__num-kid" min="0" value="0" required="">
+            </span>
+            <span>
+              <label for="room__num">Room</label>
+              <input type="number" name="room__num" class="input room__num" id="room__num" min="0" value="1" required="">
+            </span>
+          </div>
+          <div class="search__input__item search__input__item-dates">
+            <span>
+              <label for="check-in-date">Check-in</label>
+              <input type="date" class="input calender" name="check-in-date" id="check-in-date" required="" oninvalid="setCustomValidity('Enter check-in date to continue')" oninput="setCustomValidity('')">
+            </span>
+            <span>
+              <label for="check-out-date">Check-out</label>
+              <input type="date" class="input calender" name="check-out-date" id="check-out-date" required="" oninvalid="setCustomValidity('Enter check-out to continue')" oninput="setCustomValidity('')">
+            </span>
+          </div>
+          <button class="btn search__btn search__input__item search__input__item-btn">
             <svg class="search__icon icon">
               <use href="/icons.21bad73c.svg#icon-search"></use>
             </svg>
             <span>Search</span>
           </button>
         </form>
-
-        <!-- <nav class="nav">
-          <ul class="nav__list">
-            <li class="nav__item"></li>
-            <li class="nav__item">
-              
-
-            </li>
-          </ul>
-        </nav> -->
       </header>
 
       <div class="search-results">
@@ -77,19 +83,7 @@
         
       </p> -->
       </div>
-      <div class="details">
-        <!-- <div class="details__gallery">
-          <figure class="details__gallery__photo" id="photo-1">
-            <img src="" alt="" srcset="">
-          </figure>
-          <figure class="details__gallery__photo" id="photo-2">
-            <img src="" alt="" srcset="">
-          </figure>
-          <figure class="details__gallery__photo" id="photo-3">
-            <img src="" alt="" srcset="">
-          </figure>
-        </div> -->
-      </div>
+      <div class="details"></div>
     </div>
 
     <div class="overlay hidden"></div>

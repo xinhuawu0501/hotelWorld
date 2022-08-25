@@ -31,11 +31,14 @@
 }
 
 
+
 .details{
     position: relative;
     grid-area: detail;
     height: 100%;
     width: 100%;
+    max-width: 80vw;
+    margin: auto;
     overflow-y: scroll;
     font-size: inherit;
     display: grid;
@@ -116,6 +119,7 @@
                 padding: 0.5rem;
                 align-items: center;
                 &-icon{
+                    margin-right: 1rem;
                     fill: yellowgreen;
                     &--food{
                         fill: $color-emphasis;

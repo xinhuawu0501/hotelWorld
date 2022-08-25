@@ -10,14 +10,14 @@ class PaginationView extends View {
     //first page && no other page
     if (page === 1 && state.totalPage === 1) {
       html = `
-        <button class="btn--inline pagination__btn--next" data-goto="${page}">
+        <button class="btn btn--inline pagination__btn--next" data-goto="${page}">
             <span>Page ${page}</span>
         </button>`;
     }
     //first page && have other page
     else if (page === 1 && state.totalPage > 1) {
       html = `
-        <button class="btn--inline pagination__btn--next" data-goto="${
+        <button class="btn btn--inline pagination__btn--next" data-goto="${
           page + 1
         }">
             <span>Page ${page + 1}</span>
@@ -29,7 +29,7 @@ class PaginationView extends View {
     //last page
     else if (page === state.totalPage) {
       html = `
-        <button class="btn--inline pagination__btn--prev" data-goto="${
+        <button class="btn btn--inline pagination__btn--prev" data-goto="${
           page - 1
         }">
             <svg class="search__icon">
@@ -41,7 +41,7 @@ class PaginationView extends View {
     //others
     else {
       html = `
-      <button class="btn--inline pagination__btn--next"  data-goto="${
+      <button class="btn btn--inline pagination__btn--next"  data-goto="${
         page + 1
       }">
             <span>Page ${page + 1}</span>
@@ -49,7 +49,7 @@ class PaginationView extends View {
             <use href="${icons}#icon-arrow-right"></use>
             </svg>
         </button>
-        <button class="btn--inline pagination__btn--prev"  data-goto="${
+        <button class="btn btn--inline pagination__btn--prev"  data-goto="${
           page - 1
         }">
             <svg class="search__icon">

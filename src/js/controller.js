@@ -1,10 +1,9 @@
-import { API_KEY, options } from "./config.js";
 import * as model from "./model.js";
 import searchView from "../view/searchView.js";
 import previewView from "../view/previewView.js";
 import resultView from "../view/resultView.js";
 import paginationView from "../view/paginationView.js";
-import { now } from "./helper.js";
+import navView from "../view/navView.js";
 const controlSearch = async function () {
   try {
     //skeleton loading
@@ -19,7 +18,6 @@ const controlSearch = async function () {
     paginationView._render(model.state.page, model.state);
   } catch (err) {
     alert(err);
-    console.log(err);
   }
 };
 
@@ -34,12 +32,6 @@ const controlResult = async function () {
     await model.loadCurHotelNearbyandQA();
     //display data
     resultView.render(model.state.curHotel);
-    resultView._toggleModal();
-    // document
-    //   .querySelector(".details__FAQ__item--Q")
-    //   .addEventListener("click", (e) => {
-    //     e.preventDefault();
-    //   });
   } catch (error) {
     alert(error);
   }
@@ -47,14 +39,47 @@ const controlResult = async function () {
 
 const controlPagination = (goTo) => {
   //update preview list
-  previewView.render(model.getResultPerPage(goTo));
+  previewView._render(model.getResultPerPage(goTo));
   //update button
-  paginationView.render(goTo, model.state);
+  paginationView._render(goTo, model.state);
+};
+
+const controlBookMark = (target) => {
+  if (!target) return;
+  //bookmark hotel
+  if (target.classList.contains("btn-bookmark-fill")) {
+    model.state.curHotel.isBookmarked = true;
+    model.state.bookmark.push(model.state.curHotel);
+    model.setLocalStorage(model.state.bookmark);
+  }
+  //unbookmark
+  else if (target.classList.contains("btn-bookmark-empty")) {
+    model.state.curHotel.isBookmarked = false;
+    model.state.bookmark = model.state.bookmark.filter((data) => {
+      return data.hotel_id != model.state.curId;
+    });
+    model.setLocalStorage(model.state.bookmark);
+  }
+  //update bookmark modal
+  navView._renderModal(model.state.bookmark);
+};
+
+const controlRenderBookmark = (targetHotel) => {
+  resultView.render(targetHotel);
+  model.state.curId = targetHotel.hotel_id;
 };
 
 const init = () => {
   searchView.addHandler(controlSearch);
   previewView._addHandler(controlResult);
   paginationView._addHandler(controlPagination);
+  resultView._addBookmarkHandler(controlBookMark);
+  //get bookmarked hotel from local storage
+  model.getLocalStorage();
+  navView._renderModal(model.state.bookmark);
+  resultView._toggleModal();
+
+  if (!model.state.bookmark) return;
+  navView._addHandler(controlRenderBookmark);
 };
 init();

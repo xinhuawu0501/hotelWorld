@@ -533,7 +533,6 @@ function hmrAcceptRun(bundle, id) {
 
 },{}],"aenu9":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-var _configJs = require("./config.js");
 var _modelJs = require("./model.js");
 var _searchViewJs = require("../view/searchView.js");
 var _searchViewJsDefault = parcelHelpers.interopDefault(_searchViewJs);
@@ -543,7 +542,8 @@ var _resultViewJs = require("../view/resultView.js");
 var _resultViewJsDefault = parcelHelpers.interopDefault(_resultViewJs);
 var _paginationViewJs = require("../view/paginationView.js");
 var _paginationViewJsDefault = parcelHelpers.interopDefault(_paginationViewJs);
-var _helperJs = require("./helper.js");
+var _navViewJs = require("../view/navView.js");
+var _navViewJsDefault = parcelHelpers.interopDefault(_navViewJs);
 const controlSearch = async function() {
     try {
         //skeleton loading
@@ -556,7 +556,6 @@ const controlSearch = async function() {
         (0, _paginationViewJsDefault.default)._render(_modelJs.state.page, _modelJs.state);
     } catch (err) {
         alert(err);
-        console.log(err);
     }
 };
 const controlResult = async function() {
@@ -570,30 +569,273 @@ const controlResult = async function() {
         await _modelJs.loadCurHotelNearbyandQA();
         //display data
         (0, _resultViewJsDefault.default).render(_modelJs.state.curHotel);
-        (0, _resultViewJsDefault.default)._toggleModal();
-    // document
-    //   .querySelector(".details__FAQ__item--Q")
-    //   .addEventListener("click", (e) => {
-    //     e.preventDefault();
-    //   });
     } catch (error) {
         alert(error);
     }
 };
 const controlPagination = (goTo)=>{
     //update preview list
-    (0, _previewViewJsDefault.default).render(_modelJs.getResultPerPage(goTo));
+    (0, _previewViewJsDefault.default)._render(_modelJs.getResultPerPage(goTo));
     //update button
-    (0, _paginationViewJsDefault.default).render(goTo, _modelJs.state);
+    (0, _paginationViewJsDefault.default)._render(goTo, _modelJs.state);
+};
+const controlBookMark = (target)=>{
+    if (!target) return;
+    //bookmark hotel
+    if (target.classList.contains("btn-bookmark-fill")) {
+        _modelJs.state.curHotel.isBookmarked = true;
+        _modelJs.state.bookmark.push(_modelJs.state.curHotel);
+        _modelJs.setLocalStorage(_modelJs.state.bookmark);
+    } else if (target.classList.contains("btn-bookmark-empty")) {
+        _modelJs.state.curHotel.isBookmarked = false;
+        _modelJs.state.bookmark = _modelJs.state.bookmark.filter((data)=>{
+            return data.hotel_id != _modelJs.state.curId;
+        });
+        _modelJs.setLocalStorage(_modelJs.state.bookmark);
+    }
+    //update bookmark modal
+    (0, _navViewJsDefault.default)._renderModal(_modelJs.state.bookmark);
+};
+const controlRenderBookmark = (targetHotel)=>{
+    (0, _resultViewJsDefault.default).render(targetHotel);
+    _modelJs.state.curId = targetHotel.hotel_id;
 };
 const init = ()=>{
     (0, _searchViewJsDefault.default).addHandler(controlSearch);
     (0, _previewViewJsDefault.default)._addHandler(controlResult);
     (0, _paginationViewJsDefault.default)._addHandler(controlPagination);
+    (0, _resultViewJsDefault.default)._addBookmarkHandler(controlBookMark);
+    //get bookmarked hotel from local storage
+    _modelJs.getLocalStorage();
+    (0, _navViewJsDefault.default)._renderModal(_modelJs.state.bookmark);
+    (0, _resultViewJsDefault.default)._toggleModal();
+    if (!_modelJs.state.bookmark) return;
+    (0, _navViewJsDefault.default)._addHandler(controlRenderBookmark);
 };
 init();
 
-},{"./config.js":"k5Hzs","./model.js":"Y4A21","../view/searchView.js":"b2EbH","../view/previewView.js":"fFeKs","../view/resultView.js":"LyN8l","../view/paginationView.js":"0EmXV","./helper.js":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
+},{"./model.js":"Y4A21","../view/searchView.js":"b2EbH","../view/previewView.js":"fFeKs","../view/resultView.js":"LyN8l","../view/paginationView.js":"0EmXV","../view/navView.js":"3cOBB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"Y4A21":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "state", ()=>state);
+parcelHelpers.export(exports, "setLocalStorage", ()=>setLocalStorage);
+parcelHelpers.export(exports, "getLocalStorage", ()=>getLocalStorage);
+parcelHelpers.export(exports, "getBookmarkBoolean", ()=>getBookmarkBoolean);
+parcelHelpers.export(exports, "getGeo", ()=>getGeo);
+parcelHelpers.export(exports, "getSearchResult", ()=>getSearchResult);
+parcelHelpers.export(exports, "findCurHotel", ()=>findCurHotel);
+parcelHelpers.export(exports, "loadCurHotelPhotos", ()=>loadCurHotelPhotos);
+parcelHelpers.export(exports, "loadCurHotelNearbyandQA", ()=>loadCurHotelNearbyandQA);
+parcelHelpers.export(exports, "loadCurHotelFacAndReviews", ()=>loadCurHotelFacAndReviews);
+parcelHelpers.export(exports, "getResultPerPage", ()=>getResultPerPage);
+var _config = require("./config");
+var _searchView = require("../view/searchView");
+var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
+var _helperJs = require("./helper.js");
+const state = {
+    localStorageKey: "bookmarkedHotel",
+    bookmark: [],
+    // test_id: 1377073,
+    filters: {},
+    page: 1,
+    totalPage: 1,
+    curId: "",
+    curHotel: {},
+    locale: "en-gb",
+    search: {
+        query: {
+            location: "",
+            order_by: "",
+            adult_num: 0,
+            kid_num: 0,
+            room_num: 0,
+            checkin_date: "",
+            checkout_date: ""
+        },
+        results: []
+    }
+};
+const setLocalStorage = (arr)=>{
+    localStorage.setItem(state.localStorageKey, JSON.stringify(arr));
+};
+const getLocalStorage = ()=>{
+    const json = localStorage.getItem(state.localStorageKey);
+    if (json) state.bookmark = JSON.parse(json);
+};
+const getBookmarkBoolean = (state, id)=>{
+    return state.bookmark.includes((bookmarkeditem)=>{
+        return bookmarkeditem.hotel_id === id;
+    });
+};
+const getGeo = async function(address) {
+    try {
+        const locale = state.locale;
+        const url = `https://trueway-geocoding.p.rapidapi.com/Geocode?address=${address}&language=${locale}`;
+        const data = await (0, _helperJs.getJSON)(url, (0, _config.optionsForGeoCoding));
+        const { lat , lng  } = data.results[0].location;
+        state.search.location = [
+            lat,
+            lng
+        ];
+    } catch (err) {
+        alert("Please enter valid location!");
+    }
+};
+const getSearchResult = async function() {
+    try {
+        const locale = state.locale;
+        //reset page
+        state.page = 1;
+        //get search query
+        const query = (0, _searchViewDefault.default).getQuery();
+        if (!query) return;
+        state.search.query = query;
+        console.log(query);
+        //search location
+        await getGeo(query.location);
+        //fetch data
+        const url = `https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=${locale}&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`;
+        const data = await (0, _helperJs.getJSON)(url, (0, _config.options));
+        state.search.results = data.result.map((data)=>{
+            return {
+                hotel_name: data.hotel_name,
+                hotel_id: data.hotel_id,
+                hotel_address: data.address,
+                checkin_time: data.checkin,
+                checkout_time: data.checkout,
+                distance_to_city_center: data.distance_to_cc,
+                include_breakfast: data.hotel_include_breakfast,
+                free_cancellable: data.is_free_cancellable,
+                photo: data.main_photo_url,
+                max_photo: data.max_1440_photo_url,
+                review: [
+                    data.review_score,
+                    data.review_score_word,
+                    data.review_nr
+                ],
+                url: data.url,
+                unit_config: data.unit_configuration_label,
+                totalPrice: data.composite_price_breakdown.all_inclusive_amount.value,
+                currency: data.currency_code,
+                isBookmarked: getBookmarkBoolean(state, data.hotel_id)
+            };
+        });
+        //update total page
+        state.totalPage = Math.ceil(state.search.results.length / (0, _config.NUM_PER_PAGE));
+        console.log(state);
+    } catch (err) {
+        alert(err);
+    }
+};
+const findCurHotel = ()=>{
+    const curHotel = state.search.results.find((result)=>{
+        return result.hotel_id == state.curId;
+    });
+    state.curHotel = curHotel;
+};
+const loadCurHotelPhotos = async function() {
+    try {
+        const locale = state.locale;
+        const id = state.curId;
+        // const id = state.test_id;
+        const url = `https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=${locale}&hotel_id=${id}`;
+        //fetch data
+        const data = await (0, _helperJs.getJSON)(url, (0, _config.options));
+        //set state
+        state.curHotel.allPhotos = data.map((data)=>{
+            return {
+                photo_1440: data.url_1440,
+                photo_1280: data.url_max,
+                photo_square_60: data.url_square60,
+                tags: data.tags
+            };
+        });
+        console.log(state);
+    } catch (error) {
+        alert(error);
+    }
+};
+const loadCurHotelNearbyandQA = async function() {
+    try {
+        const locale = state.locale;
+        const id = state.curId;
+        // const id = state.test_id;
+        const hightlightPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=${locale}`, (0, _config.options));
+        const questionsPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/questions?locale=${locale}&hotel_id=${id}`, (0, _config.options));
+        const res = await Promise.allSettled([
+            hightlightPromise,
+            questionsPromise
+        ]);
+        //error handling
+        if (!res[0].value.ok) throw new Error(`Fail to load location highlight data`);
+        if (!res[1].value.ok) throw new Error(`Fail to load QA data`);
+        //convert to json data
+        const data = await Promise.allSettled([
+            res[0].value.json(),
+            res[1].value.json(), 
+        ]);
+        //location highlight data
+        const landmark = data[0].value.location_highlights.popular_landmarks;
+        const nearByStation = data[0].value.location_highlights.nearby_stations;
+        state.curHotel.landmark = landmark;
+        state.curHotel.nearByStation = nearByStation;
+        // //question data
+        const questions = data[1].value;
+        questions.q_and_a_pairs = data[1].value.q_and_a_pairs.filter((qa)=>{
+            return qa.answer;
+        });
+        state.curHotel.FAQ = questions;
+    } catch (err) {
+        alert(err);
+    }
+};
+const loadCurHotelFacAndReviews = async function() {
+    try {
+        const locale = state.locale;
+        const id = state.curId;
+        const facilitiesPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/facilities?locale=${locale}&hotel_id=${id}`, (0, _config.options));
+        const reviewsPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/reviews?sort_type=SORT_MOST_RELEVANT&locale=${locale}&hotel_id=${id}&language_filter=${locale}%2Cde%2Cfr&customer_type=solo_traveller%2Creview_category_group_of_friends`, (0, _config.options));
+        const res = await Promise.allSettled([
+            facilitiesPromise,
+            reviewsPromise
+        ]);
+        //error handling
+        if (!res[0].value.ok) throw new Error(`Fail to load facility data`);
+        if (!res[1].value.ok) throw new Error(`Fail to load review data`);
+        //convert to json data
+        const data = await Promise.allSettled([
+            res[0].value.json(),
+            res[1].value.json(), 
+        ]);
+        //facilities
+        state.curHotel.facilities = data[0].value;
+        //reviews
+        state.curHotel.customerReviews = data[1].value.result.map((r)=>{
+            return {
+                title: r.title,
+                travel_purpose: r.travel_purpose,
+                author_type: r.author.type_string,
+                author_name: r.author.name,
+                author_country: r.author.countrycode,
+                average_score: r.average_score.toFixed(1),
+                pros: r.pros,
+                cons: r.cons,
+                date: r.date,
+                id: r.review_id
+            };
+        });
+    } catch (err) {
+        alert(err);
+    }
+};
+const getResultPerPage = (page)=>{
+    state.page = page;
+    const start = (page - 1) * (0, _config.NUM_PER_PAGE);
+    const end = page * (0, _config.NUM_PER_PAGE);
+    return state.search.results.slice(start, end);
+};
+
+},{"./config":"k5Hzs","../view/searchView":"b2EbH","./helper.js":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "API_KEY", ()=>API_KEY);
@@ -650,217 +892,7 @@ exports.export = function(dest, destName, get) {
     });
 };
 
-},{}],"Y4A21":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "state", ()=>state);
-parcelHelpers.export(exports, "getGeo", ()=>getGeo);
-parcelHelpers.export(exports, "getSearchResult", ()=>getSearchResult);
-parcelHelpers.export(exports, "findCurHotel", ()=>findCurHotel);
-parcelHelpers.export(exports, "loadCurHotelPhotos", ()=>loadCurHotelPhotos);
-parcelHelpers.export(exports, "loadCurHotelNearbyandQA", ()=>loadCurHotelNearbyandQA);
-parcelHelpers.export(exports, "loadCurHotelFacAndReviews", ()=>loadCurHotelFacAndReviews);
-parcelHelpers.export(exports, "getResultPerPage", ()=>getResultPerPage);
-var _config = require("./config");
-var _searchView = require("../view/searchView");
-var _searchViewDefault = parcelHelpers.interopDefault(_searchView);
-var _helperJs = require("./helper.js");
-const state = {
-    test_id: 1377073,
-    filters: {},
-    page: 1,
-    totalPage: 1,
-    curId: "",
-    curHotel: {},
-    locale: "en-gb",
-    search: {
-        query: {
-            location: "",
-            order_by: "",
-            adult_num: 0,
-            kid_num: 0,
-            room_num: 0,
-            checkin_date: "",
-            checkout_date: ""
-        },
-        results: []
-    }
-};
-const getGeo = async function(address) {
-    try {
-        const locale = state.locale;
-        const url = `https://trueway-geocoding.p.rapidapi.com/Geocode?address=${address}&language=${locale}`;
-        const data = await (0, _helperJs.getJSON)(url, (0, _config.optionsForGeoCoding));
-        const { lat , lng  } = data.results[0].location;
-        state.search.location = [
-            lat,
-            lng
-        ];
-    } catch (err) {
-        console.error(err);
-        alert("Please enter valid location!");
-    }
-};
-const getSearchResult = async function() {
-    try {
-        const locale = state.locale;
-        //get search query
-        const query = (0, _searchViewDefault.default).getQuery();
-        if (!query) return;
-        state.search.query = query;
-        console.log(query);
-        //search location
-        await getGeo(query.location);
-        //fetch data
-        const url = `https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=${locale}&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`;
-        const data = await (0, _helperJs.getJSON)(url, (0, _config.options));
-        console.log(data);
-        state.search.results = data.result.map((data)=>{
-            return {
-                hotel_name: data.hotel_name,
-                hotel_id: data.hotel_id,
-                hotel_address: data.address,
-                checkin_time: data.checkin,
-                checkout_time: data.checkout,
-                distance_to_city_center: data.distance_to_cc,
-                include_breakfast: data.hotel_include_breakfast,
-                free_cancellable: data.is_free_cancellable,
-                photo: data.main_photo_url,
-                max_photo: data.max_1440_photo_url,
-                review: [
-                    data.review_score,
-                    data.review_score_word,
-                    data.review_nr
-                ],
-                url: data.url,
-                unit_config: data.unit_configuration_label,
-                totalPrice: data.composite_price_breakdown.all_inclusive_amount.value,
-                currency: data.currency_code,
-                bookmarked: "false"
-            };
-        });
-        //update total page
-        state.totalPage = Math.ceil(state.search.results.length / (0, _config.NUM_PER_PAGE));
-        console.log(state);
-    } catch (err) {
-        console.error(err);
-    }
-};
-const findCurHotel = ()=>{
-    const curHotel = state.search.results.find((result)=>{
-        return result.hotel_id == state.curId;
-    });
-    state.curHotel = curHotel;
-};
-const loadCurHotelPhotos = async function() {
-    try {
-        const locale = state.locale;
-        console.log(locale);
-        const id = state.curId;
-        // const id = state.test_id;
-        const url = `https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=${locale}&hotel_id=${id}`;
-        //fetch data
-        const data = await (0, _helperJs.getJSON)(url, (0, _config.options));
-        //set state
-        state.curHotel.allPhotos = data.map((data)=>{
-            return {
-                photo_1440: data.url_1440,
-                photo_1280: data.url_max,
-                photo_square_60: data.url_square60,
-                tags: data.tags
-            };
-        });
-        console.log(state);
-    } catch (error) {
-        console.log(error);
-    }
-};
-const loadCurHotelNearbyandQA = async function() {
-    try {
-        const locale = state.locale;
-        const id = state.curId;
-        // const id = state.test_id;
-        const hightlightPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=${locale}`, (0, _config.options));
-        const questionsPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/questions?locale=${locale}&hotel_id=${id}`, (0, _config.options));
-        const res = await Promise.allSettled([
-            hightlightPromise,
-            questionsPromise
-        ]);
-        console.log(res);
-        //error handling
-        if (!res[0].value.ok) throw new Error(`Fail to load location highlight data`);
-        if (!res[1].value.ok) throw new Error(`Fail to load QA data`);
-        //convert to json data
-        const data = await Promise.allSettled([
-            res[0].value.json(),
-            res[1].value.json(), 
-        ]);
-        //location highlight data
-        const landmark = data[0].value.location_highlights.popular_landmarks;
-        const nearByStation = data[0].value.location_highlights.nearby_stations;
-        state.curHotel.landmark = landmark;
-        state.curHotel.nearByStation = nearByStation;
-        // //question data
-        const questions = data[1].value;
-        console.log(questions);
-        questions.q_and_a_pairs = data[1].value.q_and_a_pairs.filter((qa)=>{
-            return qa.answer;
-        });
-        console.log(questions);
-        state.curHotel.FAQ = questions;
-    } catch (err) {
-        alert(err);
-        console.log(err);
-    }
-};
-const loadCurHotelFacAndReviews = async function() {
-    try {
-        const locale = state.locale;
-        const id = state.curId;
-        const facilitiesPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/facilities?locale=${locale}&hotel_id=${id}`, (0, _config.options));
-        const reviewsPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/reviews?sort_type=SORT_MOST_RELEVANT&locale=${locale}&hotel_id=${id}&language_filter=${locale}%2Cde%2Cfr&customer_type=solo_traveller%2Creview_category_group_of_friends`, (0, _config.options));
-        const res = await Promise.allSettled([
-            facilitiesPromise,
-            reviewsPromise
-        ]);
-        //error handling
-        if (!res[0].value.ok) throw new Error(`Fail to load facility data`);
-        if (!res[1].value.ok) throw new Error(`Fail to load review data`);
-        //convert to json data
-        const data = await Promise.allSettled([
-            res[0].value.json(),
-            res[1].value.json(), 
-        ]);
-        //facilities
-        state.curHotel.facilities = data[0].value;
-        //reviews
-        state.curHotel.customerReviews = data[1].value.result.map((r)=>{
-            return {
-                title: r.title,
-                travel_purpose: r.travel_purpose,
-                author_type: r.author.type_string,
-                author_name: r.author.name,
-                author_country: r.author.countrycode,
-                average_score: r.average_score.toFixed(1),
-                pros: r.pros,
-                cons: r.cons,
-                date: r.date,
-                id: r.review_id
-            };
-        });
-    } catch (err) {
-        alert(err);
-        console.log(err);
-    }
-};
-const getResultPerPage = (page)=>{
-    state.page = page;
-    const start = (page - 1) * (0, _config.NUM_PER_PAGE);
-    const end = page * (0, _config.NUM_PER_PAGE);
-    return state.search.results.slice(start, end);
-};
-
-},{"./config":"k5Hzs","../view/searchView":"b2EbH","./helper.js":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"b2EbH":[function(require,module,exports) {
+},{}],"b2EbH":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _helperJs = require("../js/helper.js");
@@ -990,10 +1022,10 @@ class PreviewView extends (0, _viewJsDefault.default) {
               </figure>
               <h4 class="preview__title">${data.hotel_name.length > 25 ? data.hotel_name.slice(0, 25) + "..." : data.hotel_name}</h4>
               <p class="preview__address">
-              <svg xmlns="http://www.w3.org/2000/svg" class="preview__address-icon icon" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M168.3 499.2C116.1 435 0 279.4 0 192C0 85.96 85.96 0 192 0C298 0 384 85.96 384 192C384 279.4 267 435 215.7 499.2C203.4 514.5 180.6 514.5 168.3 499.2H168.3zM192 256C227.3 256 256 227.3 256 192C256 156.7 227.3 128 192 128C156.7 128 128 156.7 128 192C128 227.3 156.7 256 192 256z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="preview__address-icon icon icon-title" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M168.3 499.2C116.1 435 0 279.4 0 192C0 85.96 85.96 0 192 0C298 0 384 85.96 384 192C384 279.4 267 435 215.7 499.2C203.4 514.5 180.6 514.5 168.3 499.2H168.3zM192 256C227.3 256 256 227.3 256 192C256 156.7 227.3 128 192 128C156.7 128 128 156.7 128 192C128 227.3 156.7 256 192 256z"/></svg>
               ${data.hotel_address}</p>
               <div class="preview__score">
-              <svg xmlns="http://www.w3.org/2000/svg" class="preview__score-icon icon" viewBox="0 0 576 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M381.2 150.3L524.9 171.5C536.8 173.2 546.8 181.6 550.6 193.1C554.4 204.7 551.3 217.3 542.7 225.9L438.5 328.1L463.1 474.7C465.1 486.7 460.2 498.9 450.2 506C440.3 513.1 427.2 514 416.5 508.3L288.1 439.8L159.8 508.3C149 514 135.9 513.1 126 506C116.1 498.9 111.1 486.7 113.2 474.7L137.8 328.1L33.58 225.9C24.97 217.3 21.91 204.7 25.69 193.1C29.46 181.6 39.43 173.2 51.42 171.5L195 150.3L259.4 17.97C264.7 6.954 275.9-.0391 288.1-.0391C300.4-.0391 311.6 6.954 316.9 17.97L381.2 150.3z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" class="preview__score-icon icon icon-title" viewBox="0 0 576 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M381.2 150.3L524.9 171.5C536.8 173.2 546.8 181.6 550.6 193.1C554.4 204.7 551.3 217.3 542.7 225.9L438.5 328.1L463.1 474.7C465.1 486.7 460.2 498.9 450.2 506C440.3 513.1 427.2 514 416.5 508.3L288.1 439.8L159.8 508.3C149 514 135.9 513.1 126 506C116.1 498.9 111.1 486.7 113.2 474.7L137.8 328.1L33.58 225.9C24.97 217.3 21.91 204.7 25.69 193.1C29.46 181.6 39.43 173.2 51.42 171.5L195 150.3L259.4 17.97C264.7 6.954 275.9-.0391 288.1-.0391C300.4-.0391 311.6 6.954 316.9 17.97L381.2 150.3z"/></svg>
                 <div class="preview__score-num">${data.review[0]}</div>
               </div>
             </div>  
@@ -1011,7 +1043,7 @@ class PreviewView extends (0, _viewJsDefault.default) {
         this._parentEl.addEventListener("click", (e)=>{
             const targetPreview = e.target.closest(".preview");
             const id = targetPreview.getAttribute("id");
-            _modelJs.state.curId = id;
+            _modelJs.state.curId = +id;
             handler();
         });
     }
@@ -1094,6 +1126,8 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _view = require("./view");
 var _viewDefault = parcelHelpers.interopDefault(_view);
+var _iconsSvg = require("url:../img/icons.svg");
+var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class ResultView extends (0, _viewDefault.default) {
     _parentEl = document.querySelector(".details");
     _data;
@@ -1109,8 +1143,33 @@ class ResultView extends (0, _viewDefault.default) {
             }
         });
     }
+    _addBookmarkHandler(handler) {
+        this._parentEl.addEventListener("click", (e)=>{
+            if (!e.target.closest(".btn-bookmark")) return;
+            const target = e.target.closest(".btn-bookmark");
+            const use = target.querySelector("use");
+            if (target.classList.contains("btn-bookmark-empty")) {
+                //change to fill icon
+                use.setAttribute("xlink:href", `${(0, _iconsSvgDefault.default)}#icon-bookmark-fill`);
+                target.classList.remove("btn-bookmark-empty");
+                target.classList.add("btn-bookmark-fill");
+            } else if (target.classList.contains("btn-bookmark-fill")) {
+                //change to empty icon
+                use.setAttribute("xlink:href", `${(0, _iconsSvgDefault.default)}#icon-bookmark`);
+                target.classList.add("btn-bookmark-empty");
+                target.classList.remove("btn-bookmark-fill");
+            }
+            handler(target);
+        });
+    }
     _generateMarkup(data) {
         return `
+        <button class="btn-bookmark btn-bookmark${data.isBookmarked === true ? "-fill" : "-empty"}">
+          <svg class="icon icon-bookmark">
+            <use xlink:href="${0, _iconsSvgDefault.default}#icon-bookmark${data.isBookmarked === true ? "-fill" : ""}"></use>
+          </svg>
+        </button>
+
         <div class="details__gallery">
           <figure class="details__gallery__photo" id="photo-1" >
             <img src="${data.allPhotos[0].photo_1280}" alt="Main photo">
@@ -1145,6 +1204,7 @@ class ResultView extends (0, _viewDefault.default) {
         </div>
 
         <div class="details__header details__section">
+       
           <div class="details__header-main">
           ${data.free_cancellable === 1 ? '<div class="details__header-main__isFreeCancellable">Free cancellable</div>' : ""}
           ${data.include_breakfast === 1 ? '<div class="details__header-main__hasBreakfast">Breakfast included</div>' : ""}
@@ -1152,22 +1212,23 @@ class ResultView extends (0, _viewDefault.default) {
         </div>
 
         <div class="details__header__hotel-address">
-        <svg xmlns="http://www.w3.org/2000/svg" class="details__header__hotel-address-icon icon" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M168.3 499.2C116.1 435 0 279.4 0 192C0 85.96 85.96 0 192 0C298 0 384 85.96 384 192C384 279.4 267 435 215.7 499.2C203.4 514.5 180.6 514.5 168.3 499.2H168.3zM192 256C227.3 256 256 227.3 256 192C256 156.7 227.3 128 192 128C156.7 128 128 156.7 128 192C128 227.3 156.7 256 192 256z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="details__header__hotel-address-icon icon icon-title" viewBox="0 0 384 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M168.3 499.2C116.1 435 0 279.4 0 192C0 85.96 85.96 0 192 0C298 0 384 85.96 384 192C384 279.4 267 435 215.7 499.2C203.4 514.5 180.6 514.5 168.3 499.2H168.3zM192 256C227.3 256 256 227.3 256 192C256 156.7 227.3 128 192 128C156.7 128 128 156.7 128 192C128 227.3 156.7 256 192 256z"/></svg>
           ${data.hotel_address}
         </div>
+        
         <span class="details__review">
           <span class="details__review-score">${data.review[0]}</span>
           <span class="details__review-description">${data.review[1]}</span>
         </span>
         <div class="details__price main-title">  
-          <svg xmlns="http://www.w3.org/2000/svg" class="icon details__price-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M472.8 168.4C525.1 221.4 525.1 306.6 472.8 359.6L360.8 472.9C351.5 482.3 336.3 482.4 326.9 473.1C317.4 463.8 317.4 448.6 326.7 439.1L438.6 325.9C472.5 291.6 472.5 236.4 438.6 202.1L310.9 72.87C301.5 63.44 301.6 48.25 311.1 38.93C320.5 29.61 335.7 29.7 344.1 39.13L472.8 168.4zM.0003 229.5V80C.0003 53.49 21.49 32 48 32H197.5C214.5 32 230.7 38.74 242.7 50.75L410.7 218.7C435.7 243.7 435.7 284.3 410.7 309.3L277.3 442.7C252.3 467.7 211.7 467.7 186.7 442.7L18.75 274.7C6.743 262.7 0 246.5 0 229.5L.0003 229.5zM112 112C94.33 112 80 126.3 80 144C80 161.7 94.33 176 112 176C129.7 176 144 161.7 144 144C144 126.3 129.7 112 112 112z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-title details__price-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M472.8 168.4C525.1 221.4 525.1 306.6 472.8 359.6L360.8 472.9C351.5 482.3 336.3 482.4 326.9 473.1C317.4 463.8 317.4 448.6 326.7 439.1L438.6 325.9C472.5 291.6 472.5 236.4 438.6 202.1L310.9 72.87C301.5 63.44 301.6 48.25 311.1 38.93C320.5 29.61 335.7 29.7 344.1 39.13L472.8 168.4zM.0003 229.5V80C.0003 53.49 21.49 32 48 32H197.5C214.5 32 230.7 38.74 242.7 50.75L410.7 218.7C435.7 243.7 435.7 284.3 410.7 309.3L277.3 442.7C252.3 467.7 211.7 467.7 186.7 442.7L18.75 274.7C6.743 262.7 0 246.5 0 229.5L.0003 229.5zM112 112C94.33 112 80 126.3 80 144C80 161.7 94.33 176 112 176C129.7 176 144 161.7 144 144C144 126.3 129.7 112 112 112z"/></svg>
           ${data.currency}&nbsp${Math.round(data.totalPrice)}</div>
       </div>
       
           
       <div class="details__info details__section">
         <h3 class="details__info__title main-title">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon details__info__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 128c17.67 0 32 14.33 32 32c0 17.67-14.33 32-32 32S224 177.7 224 160C224 142.3 238.3 128 256 128zM296 384h-80C202.8 384 192 373.3 192 360s10.75-24 24-24h16v-64H224c-13.25 0-24-10.75-24-24S210.8 224 224 224h32c13.25 0 24 10.75 24 24v88h16c13.25 0 24 10.75 24 24S309.3 384 296 384z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-title details__info__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 128c17.67 0 32 14.33 32 32c0 17.67-14.33 32-32 32S224 177.7 224 160C224 142.3 238.3 128 256 128zM296 384h-80C202.8 384 192 373.3 192 360s10.75-24 24-24h16v-64H224c-13.25 0-24-10.75-24-24S210.8 224 224 224h32c13.25 0 24 10.75 24 24v88h16c13.25 0 24 10.75 24 24S309.3 384 296 384z"/></svg>
         Information</h3>
         <div class="details__info__item details__info__item-distance-to-cc">
           <b>Distance from city center: &nbsp</b>
@@ -1187,7 +1248,7 @@ class ResultView extends (0, _viewDefault.default) {
 
       <div class="details__nearBy details__section">
         <h3 class="details__nearBy-title main-title">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon details__nearBy-title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M176 256C176 211.8 211.8 176 256 176C300.2 176 336 211.8 336 256C336 300.2 300.2 336 256 336C211.8 336 176 300.2 176 256zM256 0C273.7 0 288 14.33 288 32V66.65C368.4 80.14 431.9 143.6 445.3 224H480C497.7 224 512 238.3 512 256C512 273.7 497.7 288 480 288H445.3C431.9 368.4 368.4 431.9 288 445.3V480C288 497.7 273.7 512 256 512C238.3 512 224 497.7 224 480V445.3C143.6 431.9 80.14 368.4 66.65 288H32C14.33 288 0 273.7 0 256C0 238.3 14.33 224 32 224H66.65C80.14 143.6 143.6 80.14 224 66.65V32C224 14.33 238.3 0 256 0zM128 256C128 326.7 185.3 384 256 384C326.7 384 384 326.7 384 256C384 185.3 326.7 128 256 128C185.3 128 128 185.3 128 256z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-title details__nearBy-title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M176 256C176 211.8 211.8 176 256 176C300.2 176 336 211.8 336 256C336 300.2 300.2 336 256 336C211.8 336 176 300.2 176 256zM256 0C273.7 0 288 14.33 288 32V66.65C368.4 80.14 431.9 143.6 445.3 224H480C497.7 224 512 238.3 512 256C512 273.7 497.7 288 480 288H445.3C431.9 368.4 368.4 431.9 288 445.3V480C288 497.7 273.7 512 256 512C238.3 512 224 497.7 224 480V445.3C143.6 431.9 80.14 368.4 66.65 288H32C14.33 288 0 273.7 0 256C0 238.3 14.33 224 32 224H66.65C80.14 143.6 143.6 80.14 224 66.65V32C224 14.33 238.3 0 256 0zM128 256C128 326.7 185.3 384 256 384C326.7 384 384 326.7 384 256C384 185.3 326.7 128 256 128C185.3 128 128 185.3 128 256z"/></svg>
         Location Highlights</h3>
         ${data.landmark || data.nearByStation ? `
         ${data.landmark ? `<div class="details__nearBy-landmark">
@@ -1205,13 +1266,13 @@ class ResultView extends (0, _viewDefault.default) {
               <div class="details__nearBy-station-distance">${s.distance_meters} m</div>
             </div>`;
         }).join(" ")}  
-      </div>` : ""}` : `<div class="details__fallback-message">No location highlights for now :(</div>`}
+      </div>` : ""}` : `<div class="fallback-message">No location highlights for now :(</div>`}
         </div>
 
 
         <ul class="details__cusReviews details__section">
         <h3 class="details__cusReviews__title main-title">
-        <svg xmlns="http://www.w3.org/2000/svg" class="icon details__cusReviews__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 31.1c-141.4 0-255.1 93.12-255.1 208c0 49.62 21.35 94.98 56.97 130.7c-12.5 50.37-54.27 95.27-54.77 95.77c-2.25 2.25-2.875 5.734-1.5 8.734c1.249 3 4.021 4.766 7.271 4.766c66.25 0 115.1-31.76 140.6-51.39c32.63 12.25 69.02 19.39 107.4 19.39c141.4 0 255.1-93.13 255.1-207.1S397.4 31.1 256 31.1zM127.1 271.1c-17.75 0-32-14.25-32-31.1s14.25-32 32-32s32 14.25 32 32S145.7 271.1 127.1 271.1zM256 271.1c-17.75 0-31.1-14.25-31.1-31.1s14.25-32 31.1-32s31.1 14.25 31.1 32S273.8 271.1 256 271.1zM383.1 271.1c-17.75 0-32-14.25-32-31.1s14.25-32 32-32s32 14.25 32 32S401.7 271.1 383.1 271.1z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-title details__cusReviews__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 31.1c-141.4 0-255.1 93.12-255.1 208c0 49.62 21.35 94.98 56.97 130.7c-12.5 50.37-54.27 95.27-54.77 95.77c-2.25 2.25-2.875 5.734-1.5 8.734c1.249 3 4.021 4.766 7.271 4.766c66.25 0 115.1-31.76 140.6-51.39c32.63 12.25 69.02 19.39 107.4 19.39c141.4 0 255.1-93.13 255.1-207.1S397.4 31.1 256 31.1zM127.1 271.1c-17.75 0-32-14.25-32-31.1s14.25-32 32-32s32 14.25 32 32S145.7 271.1 127.1 271.1zM256 271.1c-17.75 0-31.1-14.25-31.1-31.1s14.25-32 31.1-32s31.1 14.25 31.1 32S273.8 271.1 256 271.1zM383.1 271.1c-17.75 0-32-14.25-32-31.1s14.25-32 32-32s32 14.25 32 32S401.7 271.1 383.1 271.1z"/></svg>
         Reviews</h3>
         ${data.customerReviews[0] ? ` 
           ${data.customerReviews.map((c)=>{
@@ -1238,19 +1299,19 @@ class ResultView extends (0, _viewDefault.default) {
             </div>` : ""}
             </div>
           </li>`;
-        }).join("")}` : `<div class="details__fallback-message">No reviews for now :(</div>`}
+        }).join("")}` : `<div class="fallback-message">No reviews for now :(</div>`}
         </ul>
 
         <div class="details__facilities details__section">
             <h3 class="details__facilities__title main-title">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon details__facilities__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M480 0C497.7 0 512 14.33 512 32C512 49.67 497.7 64 480 64V448C497.7 448 512 462.3 512 480C512 497.7 497.7 512 480 512H304V448H208V512H32C14.33 512 0 497.7 0 480C0 462.3 14.33 448 32 448V64C14.33 64 0 49.67 0 32C0 14.33 14.33 0 32 0H480zM112 96C103.2 96 96 103.2 96 112V144C96 152.8 103.2 160 112 160H144C152.8 160 160 152.8 160 144V112C160 103.2 152.8 96 144 96H112zM224 144C224 152.8 231.2 160 240 160H272C280.8 160 288 152.8 288 144V112C288 103.2 280.8 96 272 96H240C231.2 96 224 103.2 224 112V144zM368 96C359.2 96 352 103.2 352 112V144C352 152.8 359.2 160 368 160H400C408.8 160 416 152.8 416 144V112C416 103.2 408.8 96 400 96H368zM96 240C96 248.8 103.2 256 112 256H144C152.8 256 160 248.8 160 240V208C160 199.2 152.8 192 144 192H112C103.2 192 96 199.2 96 208V240zM240 192C231.2 192 224 199.2 224 208V240C224 248.8 231.2 256 240 256H272C280.8 256 288 248.8 288 240V208C288 199.2 280.8 192 272 192H240zM352 240C352 248.8 359.2 256 368 256H400C408.8 256 416 248.8 416 240V208C416 199.2 408.8 192 400 192H368C359.2 192 352 199.2 352 208V240zM256 288C211.2 288 173.5 318.7 162.1 360.2C159.7 373.1 170.7 384 184 384H328C341.3 384 352.3 373.1 349 360.2C338.5 318.7 300.8 288 256 288z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-title details__facilities__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M480 0C497.7 0 512 14.33 512 32C512 49.67 497.7 64 480 64V448C497.7 448 512 462.3 512 480C512 497.7 497.7 512 480 512H304V448H208V512H32C14.33 512 0 497.7 0 480C0 462.3 14.33 448 32 448V64C14.33 64 0 49.67 0 32C0 14.33 14.33 0 32 0H480zM112 96C103.2 96 96 103.2 96 112V144C96 152.8 103.2 160 112 160H144C152.8 160 160 152.8 160 144V112C160 103.2 152.8 96 144 96H112zM224 144C224 152.8 231.2 160 240 160H272C280.8 160 288 152.8 288 144V112C288 103.2 280.8 96 272 96H240C231.2 96 224 103.2 224 112V144zM368 96C359.2 96 352 103.2 352 112V144C352 152.8 359.2 160 368 160H400C408.8 160 416 152.8 416 144V112C416 103.2 408.8 96 400 96H368zM96 240C96 248.8 103.2 256 112 256H144C152.8 256 160 248.8 160 240V208C160 199.2 152.8 192 144 192H112C103.2 192 96 199.2 96 208V240zM240 192C231.2 192 224 199.2 224 208V240C224 248.8 231.2 256 240 256H272C280.8 256 288 248.8 288 240V208C288 199.2 280.8 192 272 192H240zM352 240C352 248.8 359.2 256 368 256H400C408.8 256 416 248.8 416 240V208C416 199.2 408.8 192 400 192H368C359.2 192 352 199.2 352 208V240zM256 288C211.2 288 173.5 318.7 162.1 360.2C159.7 373.1 170.7 384 184 384H328C341.3 384 352.3 373.1 349 360.2C338.5 318.7 300.8 288 256 288z"/></svg>
             Facilities</h3>
         ${data.facilities[0] ? `
             <div class="details__facilities__items">
              ${data.facilities.map((f)=>{
             return `
                <span class="details__facilities__items-item">
-               ${f.facilitytype_name == "Food & Drink" ? `<svg xmlns="http://www.w3.org/2000/svg" class="icon details__facilities__items-item-icon--food" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M221.6 148.7C224.7 161.3 224.8 174.5 222.1 187.2C219.3 199.1 213.6 211.9 205.6 222.1C191.1 238.6 173 249.1 151.1 254.1V472C151.1 482.6 147.8 492.8 140.3 500.3C132.8 507.8 122.6 512 111.1 512C101.4 512 91.22 507.8 83.71 500.3C76.21 492.8 71.1 482.6 71.1 472V254.1C50.96 250.1 31.96 238.9 18.3 222.4C10.19 212.2 4.529 200.3 1.755 187.5C-1.019 174.7-.8315 161.5 2.303 148.8L32.51 12.45C33.36 8.598 35.61 5.197 38.82 2.9C42.02 .602 45.97-.4297 49.89 .0026C53.82 .4302 57.46 2.303 60.1 5.259C62.74 8.214 64.18 12.04 64.16 16V160H81.53L98.62 11.91C99.02 8.635 100.6 5.621 103.1 3.434C105.5 1.248 108.7 .0401 111.1 .0401C115.3 .0401 118.5 1.248 120.9 3.434C123.4 5.621 124.1 8.635 125.4 11.91L142.5 160H159.1V16C159.1 12.07 161.4 8.268 163.1 5.317C166.6 2.366 170.2 .474 174.1 .0026C178-.4262 181.1 .619 185.2 2.936C188.4 5.253 190.6 8.677 191.5 12.55L221.6 148.7zM448 472C448 482.6 443.8 492.8 436.3 500.3C428.8 507.8 418.6 512 408 512C397.4 512 387.2 507.8 379.7 500.3C372.2 492.8 368 482.6 368 472V352H351.2C342.8 352 334.4 350.3 326.6 347.1C318.9 343.8 311.8 339.1 305.8 333.1C299.9 327.1 295.2 320 291.1 312.2C288.8 304.4 287.2 296 287.2 287.6L287.1 173.8C288 136.9 299.1 100.8 319.8 70.28C340.5 39.71 369.8 16.05 404.1 2.339C408.1 .401 414.2-.3202 419.4 .2391C424.6 .7982 429.6 2.62 433.9 5.546C438.2 8.472 441.8 12.41 444.2 17.03C446.7 21.64 447.1 26.78 448 32V472z"/></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" class="icon details__facilities__items-item-icon" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M438.6 105.4C451.1 117.9 451.1 138.1 438.6 150.6L182.6 406.6C170.1 419.1 149.9 419.1 137.4 406.6L9.372 278.6C-3.124 266.1-3.124 245.9 9.372 233.4C21.87 220.9 42.13 220.9 54.63 233.4L159.1 338.7L393.4 105.4C405.9 92.88 426.1 92.88 438.6 105.4H438.6z"/></svg>`}
+               ${f.facilitytype_name == "Food & Drink" ? `<svg xmlns="http://www.w3.org/2000/svg" class="icon details__facilities__items-item-icon details__facilities__items-item-icon--food" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M221.6 148.7C224.7 161.3 224.8 174.5 222.1 187.2C219.3 199.1 213.6 211.9 205.6 222.1C191.1 238.6 173 249.1 151.1 254.1V472C151.1 482.6 147.8 492.8 140.3 500.3C132.8 507.8 122.6 512 111.1 512C101.4 512 91.22 507.8 83.71 500.3C76.21 492.8 71.1 482.6 71.1 472V254.1C50.96 250.1 31.96 238.9 18.3 222.4C10.19 212.2 4.529 200.3 1.755 187.5C-1.019 174.7-.8315 161.5 2.303 148.8L32.51 12.45C33.36 8.598 35.61 5.197 38.82 2.9C42.02 .602 45.97-.4297 49.89 .0026C53.82 .4302 57.46 2.303 60.1 5.259C62.74 8.214 64.18 12.04 64.16 16V160H81.53L98.62 11.91C99.02 8.635 100.6 5.621 103.1 3.434C105.5 1.248 108.7 .0401 111.1 .0401C115.3 .0401 118.5 1.248 120.9 3.434C123.4 5.621 124.1 8.635 125.4 11.91L142.5 160H159.1V16C159.1 12.07 161.4 8.268 163.1 5.317C166.6 2.366 170.2 .474 174.1 .0026C178-.4262 181.1 .619 185.2 2.936C188.4 5.253 190.6 8.677 191.5 12.55L221.6 148.7zM448 472C448 482.6 443.8 492.8 436.3 500.3C428.8 507.8 418.6 512 408 512C397.4 512 387.2 507.8 379.7 500.3C372.2 492.8 368 482.6 368 472V352H351.2C342.8 352 334.4 350.3 326.6 347.1C318.9 343.8 311.8 339.1 305.8 333.1C299.9 327.1 295.2 320 291.1 312.2C288.8 304.4 287.2 296 287.2 287.6L287.1 173.8C288 136.9 299.1 100.8 319.8 70.28C340.5 39.71 369.8 16.05 404.1 2.339C408.1 .401 414.2-.3202 419.4 .2391C424.6 .7982 429.6 2.62 433.9 5.546C438.2 8.472 441.8 12.41 444.2 17.03C446.7 21.64 447.1 26.78 448 32V472z"/></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" class="icon details__facilities__items-item-icon" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M438.6 105.4C451.1 117.9 451.1 138.1 438.6 150.6L182.6 406.6C170.1 419.1 149.9 419.1 137.4 406.6L9.372 278.6C-3.124 266.1-3.124 245.9 9.372 233.4C21.87 220.9 42.13 220.9 54.63 233.4L159.1 338.7L393.4 105.4C405.9 92.88 426.1 92.88 438.6 105.4H438.6z"/></svg>`}
                ${f.facility_name}
               </span>`;
         }).join("")}
@@ -1260,7 +1321,7 @@ class ResultView extends (0, _viewDefault.default) {
         <div class="details__FAQ details__section">
           <header>
             <h3 class="details__FAQ__title main-title">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon details__FAQ__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 400c-18 0-32-14-32-32s13.1-32 32-32c17.1 0 32 14 32 32S273.1 400 256 400zM325.1 258L280 286V288c0 13-11 24-24 24S232 301 232 288V272c0-8 4-16 12-21l57-34C308 213 312 206 312 198C312 186 301.1 176 289.1 176h-51.1C225.1 176 216 186 216 198c0 13-11 24-24 24s-24-11-24-24C168 159 199 128 237.1 128h51.1C329 128 360 159 360 198C360 222 347 245 325.1 258z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-title details__FAQ__title-icon" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 400c-18 0-32-14-32-32s13.1-32 32-32c17.1 0 32 14 32 32S273.1 400 256 400zM325.1 258L280 286V288c0 13-11 24-24 24S232 301 232 288V272c0-8 4-16 12-21l57-34C308 213 312 206 312 198C312 186 301.1 176 289.1 176h-51.1C225.1 176 216 186 216 198c0 13-11 24-24 24s-24-11-24-24C168 159 199 128 237.1 128h51.1C329 128 360 159 360 198C360 222 347 245 325.1 258z"/></svg>
             FAQ</h3>
             <div class="details__FAQ__sidenote">${data.FAQ.average_response_time}</div>
           </header>
@@ -1278,12 +1339,12 @@ class ResultView extends (0, _viewDefault.default) {
             </div>
           </div>`;
         }).join("")}
-      </div>` : `<div class="details__fallback-message">No FAQ for now :(</div>`}
+      </div>` : `<div class="fallback-message">No FAQ for now :(</div>`}
         </div>
 
         <div class="details__link">
           <a href="${data.url}" class="details__link__link-item">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon details__link__link-item-icon" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 64C256 46.33 270.3 32 288 32H415.1C415.1 32 415.1 32 415.1 32C420.3 32 424.5 32.86 428.2 34.43C431.1 35.98 435.5 38.27 438.6 41.3C438.6 41.35 438.6 41.4 438.7 41.44C444.9 47.66 447.1 55.78 448 63.9C448 63.94 448 63.97 448 64V192C448 209.7 433.7 224 416 224C398.3 224 384 209.7 384 192V141.3L214.6 310.6C202.1 323.1 181.9 323.1 169.4 310.6C156.9 298.1 156.9 277.9 169.4 265.4L338.7 96H288C270.3 96 256 81.67 256 64V64zM0 128C0 92.65 28.65 64 64 64H160C177.7 64 192 78.33 192 96C192 113.7 177.7 128 160 128H64V416H352V320C352 302.3 366.3 288 384 288C401.7 288 416 302.3 416 320V416C416 451.3 387.3 480 352 480H64C28.65 480 0 451.3 0 416V128z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-title details__link__link-item-icon" viewBox="0 0 448 512"><!--! Font Awesome Pro 6.1.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M256 64C256 46.33 270.3 32 288 32H415.1C415.1 32 415.1 32 415.1 32C420.3 32 424.5 32.86 428.2 34.43C431.1 35.98 435.5 38.27 438.6 41.3C438.6 41.35 438.6 41.4 438.7 41.44C444.9 47.66 447.1 55.78 448 63.9C448 63.94 448 63.97 448 64V192C448 209.7 433.7 224 416 224C398.3 224 384 209.7 384 192V141.3L214.6 310.6C202.1 323.1 181.9 323.1 169.4 310.6C156.9 298.1 156.9 277.9 169.4 265.4L338.7 96H288C270.3 96 256 81.67 256 64V64zM0 128C0 92.65 28.65 64 64 64H160C177.7 64 192 78.33 192 96C192 113.7 177.7 128 160 128H64V416H352V320C352 302.3 366.3 288 384 288C401.7 288 416 302.3 416 320V416C416 451.3 387.3 480 352 480H64C28.65 480 0 451.3 0 416V128z"/></svg>
             Visit Booking.com to explore more</a>
           </div>
     `;
@@ -1291,7 +1352,7 @@ class ResultView extends (0, _viewDefault.default) {
 }
 exports.default = new ResultView();
 
-},{"./view":"bx4GI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"0EmXV":[function(require,module,exports) {
+},{"./view":"bx4GI","url:../img/icons.svg":"loVOp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"0EmXV":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _view = require("./view");
@@ -1306,31 +1367,31 @@ class PaginationView extends (0, _viewDefault.default) {
         let html;
         //first page && no other page
         if (page === 1 && state.totalPage === 1) html = `
-        <button class="btn--inline pagination__btn--next" data-goto="${page}">
+        <button class="btn btn--inline pagination__btn--next" data-goto="${page}">
             <span>Page ${page}</span>
         </button>`;
         else if (page === 1 && state.totalPage > 1) html = `
-        <button class="btn--inline pagination__btn--next" data-goto="${page + 1}">
+        <button class="btn btn--inline pagination__btn--next" data-goto="${page + 1}">
             <span>Page ${page + 1}</span>
             <svg class="search__icon">
             <use href="${0, _iconsSvgDefault.default}#icon-arrow-right"></use>
             </svg>
         </button>`;
         else if (page === state.totalPage) html = `
-        <button class="btn--inline pagination__btn--prev" data-goto="${page - 1}">
+        <button class="btn btn--inline pagination__btn--prev" data-goto="${page - 1}">
             <svg class="search__icon">
                 <use href="${0, _iconsSvgDefault.default}#icon-arrow-left"></use>
             </svg>
             <span>Page ${page - 1}</span>
         </button>`;
         else html = `
-      <button class="btn--inline pagination__btn--next"  data-goto="${page + 1}">
+      <button class="btn btn--inline pagination__btn--next"  data-goto="${page + 1}">
             <span>Page ${page + 1}</span>
             <svg class="search__icon">
             <use href="${0, _iconsSvgDefault.default}#icon-arrow-right"></use>
             </svg>
         </button>
-        <button class="btn--inline pagination__btn--prev"  data-goto="${page - 1}">
+        <button class="btn btn--inline pagination__btn--prev"  data-goto="${page - 1}">
             <svg class="search__icon">
                 <use href="${0, _iconsSvgDefault.default}#icon-arrow-left"></use>
             </svg>
@@ -1356,6 +1417,44 @@ class PaginationView extends (0, _viewDefault.default) {
 }
 exports.default = new PaginationView();
 
-},{"./view":"bx4GI","../js/config.js":"k5Hzs","url:../img/icons.svg":"loVOp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["fA0o9","aenu9"], "aenu9", "parcelRequiref439")
+},{"./view":"bx4GI","../js/config.js":"k5Hzs","url:../img/icons.svg":"loVOp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3cOBB":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _view = require("./view");
+var _viewDefault = parcelHelpers.interopDefault(_view);
+class navView extends (0, _viewDefault.default) {
+    _parentEl = document.querySelector(".nav__item__modal-bookmark");
+    _generateModalMarkup(data) {
+        return data[0] ? `
+    ${data.map((bookmarkedHotel)=>{
+            return `
+        <li class="nav__item__modal-list nav__item__modal-bookmark-list" id="${bookmarkedHotel.hotel_id}">
+            <img src="${bookmarkedHotel.photo}" alt="hotel-photo">
+            ${bookmarkedHotel.hotel_name}
+            <div class="score">${bookmarkedHotel.review[0]}</div>
+        </li>`;
+        }).join("")}
+        ` : `<div class="fallback-message">No favorite hotel yet !</div>`;
+    }
+    _renderModal(data) {
+        this.clear();
+        this._data = data;
+        const markup = this._generateModalMarkup(data);
+        this._parentEl.insertAdjacentHTML("afterbegin", markup);
+    }
+    _addHandler(handler) {
+        this._parentEl.addEventListener("click", (e)=>{
+            if (!e.target.closest(".nav__item__modal-bookmark-list")) return;
+            const id = e.target.closest(".nav__item__modal-bookmark-list").getAttribute("id");
+            const targetHotel = this._data.find((hotel)=>{
+                return hotel.hotel_id === +id;
+            });
+            handler(targetHotel);
+        });
+    }
+}
+exports.default = new navView();
+
+},{"./view":"bx4GI","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["fA0o9","aenu9"], "aenu9", "parcelRequiref439")
 
 //# sourceMappingURL=index.e37f48ea.js.map
