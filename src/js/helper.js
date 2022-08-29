@@ -7,7 +7,6 @@ export const timeOut = async function () {
 };
 //get current date
 export const now = new Date().toISOString().split("T")[0];
-
 //get json data
 export const getJSON = async function (url, option) {
   try {

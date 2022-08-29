@@ -1834,6 +1834,7 @@ const getSearchResult = async function() {
         state.totalPage = Math.ceil(state.search.results.length / (0, _config.NUM_PER_PAGE));
     } catch (err) {
         alert(err);
+        console.log(err);
     }
 };
 const findCurHotel = ()=>{
@@ -2038,8 +2039,8 @@ class SearchView {
     addHandler(handler) {
         this._parentEl.addEventListener("submit", (e)=>{
             e.preventDefault();
-            for (const inputField of e.target)inputField.value = "";
             handler();
+            for (const inputField of e.target)inputField.value = "";
         });
     }
 }

@@ -92,6 +92,7 @@ export const getSearchResult = async function () {
     state.totalPage = Math.ceil(state.search.results.length / NUM_PER_PAGE);
   } catch (err) {
     alert(err);
+    console.log(err);
   }
 };
 

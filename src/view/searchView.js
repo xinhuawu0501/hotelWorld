@@ -4,6 +4,7 @@ class SearchView {
 
   getQuery() {
     const result = this._parentEl.elements;
+
     const checkInDate = new Date(result[5].value).toISOString().split("T")[0];
     const checkOutDate = new Date(result[6].value).toISOString().split("T")[0];
     //check total guest>0 && room number > 0
@@ -42,10 +43,12 @@ class SearchView {
   addHandler(handler) {
     this._parentEl.addEventListener("submit", (e) => {
       e.preventDefault();
+
+      handler();
+
       for (const inputField of e.target) {
         inputField.value = "";
       }
-      handler();
     });
   }
 }
