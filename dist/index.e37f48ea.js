@@ -1997,6 +1997,7 @@ exports.export = function(dest, destName, get) {
 },{}],"b2EbH":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
+var _helperJs = require("../js/helper.js");
 class SearchView {
     _parentEl = document.querySelector(".search");
     getQuery() {
@@ -2016,7 +2017,7 @@ class SearchView {
             alert("Check-out date cannot be earlier than check-in date");
             return;
         }
-        if (checkInDate < now) {
+        if (checkInDate < (0, _helperJs.now)) {
             alert("Check-in cannot be earlier than current date");
             return;
         }
@@ -2037,16 +2038,14 @@ class SearchView {
     addHandler(handler) {
         this._parentEl.addEventListener("submit", (e)=>{
             e.preventDefault();
-            // for (const inputField of e.target) {
-            //   inputField.value = "";
-            // }
+            for (const inputField of e.target)inputField.value = "";
             handler();
         });
     }
 }
 exports.default = new SearchView();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lVRAz":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../js/helper.js":"lVRAz"}],"lVRAz":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "timeOut", ()=>timeOut);

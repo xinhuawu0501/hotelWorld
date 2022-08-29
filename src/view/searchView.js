@@ -1,3 +1,4 @@
+import { now } from "../js/helper.js";
 class SearchView {
   _parentEl = document.querySelector(".search");
 
@@ -41,9 +42,9 @@ class SearchView {
   addHandler(handler) {
     this._parentEl.addEventListener("submit", (e) => {
       e.preventDefault();
-      // for (const inputField of e.target) {
-      //   inputField.value = "";
-      // }
+      for (const inputField of e.target) {
+        inputField.value = "";
+      }
       handler();
     });
   }
