@@ -1999,10 +1999,6 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 class SearchView {
     _parentEl = document.querySelector(".search");
-    _setDatePickerDate() {
-        //set check-in date default to today
-        document.getElementById("check-in-date").value = now;
-    }
     getQuery() {
         const result = this._parentEl.elements;
         const checkInDate = new Date(result[5].value).toISOString().split("T")[0];
@@ -2054,6 +2050,7 @@ exports.default = new SearchView();
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "timeOut", ()=>timeOut);
+parcelHelpers.export(exports, "now", ()=>now);
 parcelHelpers.export(exports, "getJSON", ()=>getJSON);
 const timeOut = async function() {
     return new Promise(function(_, reject) {
@@ -2062,6 +2059,7 @@ const timeOut = async function() {
         }, "8000");
     });
 };
+const now = new Date().toISOString().split("T")[0];
 const getJSON = async function(url, option) {
     try {
         const res = await fetch(url, option);
