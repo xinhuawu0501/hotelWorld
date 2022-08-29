@@ -8,30 +8,34 @@
 
   &-title{
     margin-right: 1rem;
+    @include rwd(phone){
+    margin-right: 0.5rem;
+  }
   }
   &-bookmark{
     fill: white;
+    width: 2.4rem;
+    height: 2.4rem;
     transition: transform .3s;
     &:hover{
       opacity: 1;
-      transform: scale(1.3);
+      transform: scale(1.5);
     }
   }
 }
 
 .btn-bookmark{
-  background-color: $color-grey-light-4;
+  background-color: rgba(237, 244, 247, 0.659);
   position: absolute;
   top: 2rem;
   right: 2rem;
   z-index: 10;
   border-radius: 100%;
   overflow: hidden;
-  opacity: 0.8;
-  width: 5rem;
-  height: 5rem;
-  @include flex-row-c;
-  justify-content: center; 
+  width: 6rem;
+  height: 6rem;
+  @include flex-row-cc;
+ 
   }
 
 
@@ -64,7 +68,7 @@
 .btn{
     padding: 1rem 2rem;
     border-radius: 5rem;
-    background-color: $color-grey-light-2;
+    background-color: $color-grey-light-1;
     color: $color-primary;
     @include title(1.4rem);
     @include flex-row-c;

@@ -8,8 +8,12 @@
         flex-wrap: wrap;
         max-width: 95rem;
         margin: auto;  
-        padding: 3rem 2rem;
+        padding: 2rem;
        
+        @include rwd(phone){
+            padding: 3rem 0;
+        }
+
         &__input__item{
             width: max-content;
             height: max-content;

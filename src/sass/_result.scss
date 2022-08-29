@@ -4,8 +4,7 @@
 
 .details__link{
     grid-area: link;
-    margin: 1rem;
-    justify-self: center;
+    margin: 1rem auto;
 
     &__link-item{
         padding: 10rem;
@@ -17,7 +16,8 @@
        &-icon{
            fill: white;
        }
-    }    
+    }  
+ 
 }
 .details__review{
     @include reviewScoreLabel(1.8rem);
@@ -37,13 +37,13 @@
     grid-area: detail;
     height: 100%;
     width: 100%;
-    max-width: 80vw;
+    max-width: 100rem;
     margin: auto;
     overflow-y: scroll;
     font-size: inherit;
     display: grid;
-    grid-template-columns: 2fr minmax(1fr, 25rem);
-    grid-template-rows: 50vh max-content max-content minmax(min-content, 20rem) minmax(min-content, 1fr) minmax(min-content, 40rem) minmax(max-content, 10rem);
+    grid-template-columns: 2fr minmax(min-content, 1fr);
+    grid-template-rows: 60vh max-content max-content minmax(min-content, 20rem) minmax(min-content, 1fr) minmax(min-content, 40rem) minmax(max-content, 10rem);
     grid-template-areas:
     "img img"
     "header header"
@@ -54,11 +54,19 @@
     "link link"
     ;
 
+    @include rwd(phone){
+       @include flex-col-c;
+       align-items: stretch;
+    }
+
     &__section{
-        padding: 2rem;
+        padding: 4rem 3rem;
         border: lightgrey 0.5px solid;
         border-radius: 2rem;
         margin: 1rem;
+        @include rwd(phone){
+             padding: 2rem;
+         }   
     }
    
 
@@ -239,7 +247,6 @@
         grid-template-areas: 
         "main review"
         "address price";
-        align-items: center;
 
         &-main{
             grid-area: main;
@@ -271,6 +278,7 @@
     &__price{
         grid-area: price;
         justify-self: flex-end;
+        height: 100%;
         &-icon{
             fill: $color-emphasis;
         }
@@ -296,9 +304,11 @@
 
     &__nearBy{
         grid-area: location;
+        &__items{
         @include flex-col-c;
-        width: max-content;
-        max-width: 25rem;
+        align-items: stretch;
+
+        }
         &-title{
             &-icon{
                 fill: $color-star-yellow;
@@ -314,7 +324,6 @@
             }
         }
         &-station{
-            width: 100%;
             @include flex-col-c;
             &-item{
                 padding: 1rem 0;
@@ -328,6 +337,15 @@
                 justify-self: end;
             }
         }
+        @include rwd(phone){
+            &__items{
+             max-width: 70%;
+             margin: auto;
+            }
+      
+          
+         }
+     
     }
     &__FAQ{
         grid-area: QA;

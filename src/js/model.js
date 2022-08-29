@@ -133,8 +133,6 @@ export const loadCurHotelPhotos = async function () {
   }
 };
 
-// loadCurHotelPhotos();
-
 export const loadCurHotelNearbyandQA = async function () {
   try {
     const locale = state.locale;
@@ -169,7 +167,6 @@ export const loadCurHotelNearbyandQA = async function () {
     state.curHotel.landmark = landmark;
     state.curHotel.nearByStation = nearByStation;
 
-    // //question data
     const questions = data[1].value;
     questions.q_and_a_pairs = data[1].value.q_and_a_pairs.filter((qa) => {
       return qa.answer;

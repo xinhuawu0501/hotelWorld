@@ -4,6 +4,8 @@ import previewView from "../view/previewView.js";
 import resultView from "../view/resultView.js";
 import paginationView from "../view/paginationView.js";
 import navView from "../view/navView.js";
+import "core-js/stable";
+import "regenerator-runtime";
 const controlSearch = async function () {
   try {
     //skeleton loading
@@ -31,7 +33,7 @@ const controlResult = async function () {
     await model.loadCurHotelFacAndReviews();
     await model.loadCurHotelNearbyandQA();
     //display data
-    resultView.render(model.state.curHotel);
+    resultView._render(model.state.curHotel);
   } catch (error) {
     alert(error);
   }
@@ -63,10 +65,10 @@ const controlBookMark = (target) => {
   //update bookmark modal
   navView._renderModal(model.state.bookmark);
 };
-
 const controlRenderBookmark = (targetHotel) => {
-  resultView.render(targetHotel);
+  resultView._render(targetHotel);
   model.state.curId = targetHotel.hotel_id;
+  model.state.curHotel = targetHotel;
 };
 
 const init = () => {

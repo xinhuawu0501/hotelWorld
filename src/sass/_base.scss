@@ -25,6 +25,13 @@ $bp-large: 78.15em; // 1250px
 $bp-medium: 61.25em; // 980px
 $bp-small: 37.5em; // 600px
 $bp-smallest: 31.25em; // 500px
+@mixin rwd($breakpoint) {
+  @if $breakpoint == phone {
+    @media (max-width: 430px) {
+      @content
+    }
+  }
+}
 
 @mixin list-photo {
   width: 5rem;
@@ -64,7 +71,7 @@ $bp-smallest: 31.25em; // 500px
   border-radius: 1.5rem;
 }
 @mixin box-shadow {
-  box-shadow: 0 0.5rem 0.8rem #24151017 ;
+  box-shadow: 0 0.5rem 0.8rem #120a0725 ;
 }
 @mixin label($color) {
   background-color: $color;
@@ -99,7 +106,7 @@ $bp-smallest: 31.25em; // 500px
 @mixin icon-size-margin {
   height: 2rem;
   width: 2rem;
-  margin-right: 0.5rem;
+  
 }
 
 @mixin gallery-photo{
@@ -137,12 +144,9 @@ $bp-smallest: 31.25em; // 500px
   appearance: none;
   font-family: 'Cabin', sans-serif;
   list-style: none;
-
-  
 }
 
 html {
-  // position: relative;
   box-sizing: border-box;
   font-size: 62.5%;
   @media only screen and (max-width: $bp-medium) {
@@ -154,7 +158,6 @@ body {
   position: relative;
   font-family: 'Nunito Sans', sans-serif;
   font-size: 1.6rem;
-  color: $color-grey-dark-1;
   background-image: $gradient;
   background-size: cover;
   background-repeat: no-repeat;
@@ -164,7 +167,7 @@ body {
 .container {
   max-width: 120rem;
   min-height: 117rem;
-  margin: 4vw auto;
+  margin: 4vw auto 0 auto;
   background-color: #fff;
   border-radius: 9px;
   overflow: hidden;
@@ -193,7 +196,7 @@ body {
 
   &__logo{
     @include title(2.4rem);
-    color: $font-color-dark;
+    color: $font-color;
   }
   &__item{
     @include flex-row-c;
@@ -215,8 +218,7 @@ body {
       min-height: max-content;
       top: 4rem;
       right: 0;
-      @include flex-row-cc;
-
+    
       @include box-shadow;
       &-list{
         width: 100%;
@@ -325,6 +327,10 @@ body {
     height: 80vh;
     padding: 6rem 2rem;
 
+    @include rwd(phone){
+      width: 90vw;
+      left: 5%;
+    }
     
     &__main{
       overflow-y: scroll;
@@ -362,5 +368,11 @@ body {
   text-align: center;
   color: $font-color-light;
   font-size: 1.8rem;
+}
+
+.copyright{
+  @include flex-row-cc;
+  padding: 3rem;
+  color: white;
 }
 

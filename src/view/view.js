@@ -19,11 +19,4 @@ export default class View {
         `;
     this._parentEl.insertAdjacentHTML("afterbegin", markup);
   }
-
-  render(data) {
-    this.clear();
-    this._data = data;
-    const markup = this._generateMarkup(data);
-    this._parentEl.insertAdjacentHTML("afterbegin", markup);
-  }
 }

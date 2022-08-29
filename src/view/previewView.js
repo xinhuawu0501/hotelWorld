@@ -26,8 +26,9 @@ class PreviewView extends View {
   }
   _generateMarkUp(results) {
     return results
-      .map((data) => {
-        return `
+      ? results
+          .map((data) => {
+            return `
     <li class="preview" id="${data.hotel_id}">
             <div class="preview__link preview__link--active" >
               <figure class="preview__fig">
@@ -47,8 +48,9 @@ class PreviewView extends View {
               </div>
             </div>  
           </li>`;
-      })
-      .join("");
+          })
+          .join("")
+      : `<div class="fallback-message">Oops! No match is found, please try again!</div>`;
   }
   _render(data) {
     document.querySelector(".pagination").innerHTML = "";
