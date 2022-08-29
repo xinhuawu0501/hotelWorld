@@ -44,8 +44,6 @@ a{
                 grid-area: title;
                 @include title(1.4rem);
                 align-self: flex-end;
-
-
             }
             &__address{
                 grid-area: address;
@@ -59,6 +57,7 @@ a{
             &__score{
                 grid-area: score;
                 justify-self: end;
+                align-self: flex-end;
                 @include flex-row-c;
                 &-icon{
                     fill: $color-star-yellow

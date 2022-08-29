@@ -981,7 +981,7 @@ a:visited {
 
 .search-results .results .preview__score {
   grid-area: score;
-  justify-self: end;
+  place-self: flex-end end;
   align-items: center;
   display: flex;
 }
@@ -1386,7 +1386,7 @@ a:visited {
 
 .search-results .results .preview__score {
   grid-area: score;
-  justify-self: end;
+  place-self: flex-end end;
   align-items: center;
   display: flex;
 }
@@ -2173,7 +2173,7 @@ a:visited {
 
 .search-results .results .preview__score {
   grid-area: score;
-  justify-self: end;
+  place-self: flex-end end;
   align-items: center;
   display: flex;
 }
@@ -2847,7 +2847,7 @@ a:visited {
 
 .search-results .results .preview__score {
   grid-area: score;
-  justify-self: end;
+  place-self: flex-end end;
   align-items: center;
   display: flex;
 }
