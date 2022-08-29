@@ -1746,7 +1746,6 @@ var _helperJs = require("./helper.js");
 const state = {
     localStorageKey: "bookmarkedHotel",
     bookmark: [],
-    // test_id: 1377073,
     filters: {},
     page: 1,
     totalPage: 1,
@@ -1801,12 +1800,12 @@ const getSearchResult = async function() {
         const query = (0, _searchViewDefault.default).getQuery();
         if (!query) return;
         state.search.query = query;
-        console.log(query);
         //search location
         await getGeo(query.location);
         //fetch data
         const url = `https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=${locale}&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`;
         const data = await (0, _helperJs.getJSON)(url, (0, _config.options));
+        if (!data.result) return;
         state.search.results = data.result.map((data)=>{
             return {
                 hotel_name: data.hotel_name,
@@ -1833,7 +1832,6 @@ const getSearchResult = async function() {
         });
         //update total page
         state.totalPage = Math.ceil(state.search.results.length / (0, _config.NUM_PER_PAGE));
-        console.log(state);
     } catch (err) {
         alert(err);
     }
@@ -1848,7 +1846,6 @@ const loadCurHotelPhotos = async function() {
     try {
         const locale = state.locale;
         const id = state.curId;
-        // const id = state.test_id;
         const url = `https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=${locale}&hotel_id=${id}`;
         //fetch data
         const data = await (0, _helperJs.getJSON)(url, (0, _config.options));
@@ -1861,7 +1858,6 @@ const loadCurHotelPhotos = async function() {
                 tags: data.tags
             };
         });
-        console.log(state);
     } catch (error) {
         alert(error);
     }
@@ -1870,7 +1866,6 @@ const loadCurHotelNearbyandQA = async function() {
     try {
         const locale = state.locale;
         const id = state.curId;
-        // const id = state.test_id;
         const hightlightPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=${locale}`, (0, _config.options));
         const questionsPromise = fetch(`https://booking-com.p.rapidapi.com/v1/hotels/questions?locale=${locale}&hotel_id=${id}`, (0, _config.options));
         const res = await Promise.allSettled([
@@ -1967,10 +1962,7 @@ const optionsForGeoCoding = {
         "X-RapidAPI-Host": "trueway-geocoding.p.rapidapi.com"
     }
 };
-const NUM_PER_PAGE = 12; //8212341a06msh116c63045407b15p1bffecjsn3f8fe6a12567
- //7a98e88db5msh5087ec2115eb42bp16889cjsnc4301d679489
- //f66a571a87msh5e5cfd9538664d8p18bccfjsneb3752d5ac69
- //0ea0a61466msh49856b96682cfb0p1b05ddjsn59cffaba105d
+const NUM_PER_PAGE = 12;
 
 },{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
@@ -2005,16 +1997,14 @@ exports.export = function(dest, destName, get) {
 },{}],"b2EbH":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
-var _helperJs = require("../js/helper.js");
 class SearchView {
     _parentEl = document.querySelector(".search");
     _setDatePickerDate() {
         //set check-in date default to today
-        document.getElementById("check-in-date").value = (0, _helperJs.now);
+        document.getElementById("check-in-date").value = now;
     }
     getQuery() {
         const result = this._parentEl.elements;
-        console.log(result[5].value, result[6].value);
         const checkInDate = new Date(result[5].value).toISOString().split("T")[0];
         const checkOutDate = new Date(result[6].value).toISOString().split("T")[0];
         //check total guest>0 && room number > 0
@@ -2030,7 +2020,7 @@ class SearchView {
             alert("Check-out date cannot be earlier than check-in date");
             return;
         }
-        if (checkInDate < (0, _helperJs.now)) {
+        if (checkInDate < now) {
             alert("Check-in cannot be earlier than current date");
             return;
         }
@@ -2038,7 +2028,6 @@ class SearchView {
             alert("Cannot stay less than one night");
             return;
         }
-        console.log(result[5].value, result[6].value);
         return {
             location: result[0].value.toLowerCase(),
             order_by: result[1].value.toLowerCase(),
@@ -2061,13 +2050,11 @@ class SearchView {
 }
 exports.default = new SearchView();
 
-},{"../js/helper.js":"lVRAz","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lVRAz":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"lVRAz":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "timeOut", ()=>timeOut);
-parcelHelpers.export(exports, "now", ()=>now);
 parcelHelpers.export(exports, "getJSON", ()=>getJSON);
-var _config = require("./config");
 const timeOut = async function() {
     return new Promise(function(_, reject) {
         setTimeout(()=>{
@@ -2075,8 +2062,6 @@ const timeOut = async function() {
         }, "8000");
     });
 };
-const now = new Date().toISOString().split("T")[0];
-console.log(now);
 const getJSON = async function(url, option) {
     try {
         const res = await fetch(url, option);
@@ -2094,7 +2079,7 @@ const getJSON = async function(url, option) {
     }
 };
 
-},{"./config":"k5Hzs","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fFeKs":[function(require,module,exports) {
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"fFeKs":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _modelJs = require("../js/model.js");
@@ -2490,7 +2475,6 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _view = require("./view");
 var _viewDefault = parcelHelpers.interopDefault(_view);
-var _configJs = require("../js/config.js");
 var _iconsSvg = require("url:../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class PaginationView extends (0, _viewDefault.default) {
@@ -2541,16 +2525,14 @@ class PaginationView extends (0, _viewDefault.default) {
         this._parentEl.addEventListener("click", (e)=>{
             const btn = e.target.closest(".btn--inline");
             if (!btn) return;
-            console.log(btn);
             const goToPage = +btn.dataset.goto;
-            console.log(goToPage);
             handler(goToPage);
         });
     }
 }
 exports.default = new PaginationView();
 
-},{"./view":"bx4GI","../js/config.js":"k5Hzs","url:../img/icons.svg":"loVOp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3cOBB":[function(require,module,exports) {
+},{"./view":"bx4GI","url:../img/icons.svg":"loVOp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3cOBB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _view = require("./view");

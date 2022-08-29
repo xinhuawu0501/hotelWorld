@@ -1,5 +1,3 @@
-import { options } from "./config";
-
 export const timeOut = async function () {
   return new Promise(function (_, reject) {
     setTimeout(() => {
@@ -7,18 +5,6 @@ export const timeOut = async function () {
     }, "8000");
   });
 };
-
-//get current date
-export const now = new Date().toISOString().split("T")[0];
-console.log(now);
-
-//get user locale
-// export const locale =
-//   navigator.languages && navigator.languages[0]
-//     ? navigator.languages[0].toLocaleLowerCase()
-//     : "en-gb";
-// console.log(locale);
-// console.log(navigator.languages);
 
 //get json data
 export const getJSON = async function (url, option) {

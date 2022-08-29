@@ -1,10 +1,9 @@
 import { options, optionsForGeoCoding, NUM_PER_PAGE } from "./config";
 import searchView from "../view/searchView";
-import { getJSON, timeOut } from "./helper.js";
+import { getJSON } from "./helper.js";
 export const state = {
   localStorageKey: "bookmarkedHotel",
   bookmark: [],
-  // test_id: 1377073,
   filters: {},
   page: 1,
   totalPage: 1,
@@ -39,10 +38,6 @@ export const getBookmarkBoolean = (state, id) => {
     return bookmarkeditem.hotel_id === id;
   });
 };
-// export let getLocale = document.documentElement.lang;
-// console.log(getLocale);
-// getLocale = locale;
-// console.log(getLocale);
 
 export const getGeo = async function (address) {
   try {
@@ -65,7 +60,6 @@ export const getSearchResult = async function () {
     const query = searchView.getQuery();
     if (!query) return;
     state.search.query = query;
-    console.log(query);
     //search location
     await getGeo(query.location);
 
@@ -73,6 +67,7 @@ export const getSearchResult = async function () {
     const url = `https://booking-com.p.rapidapi.com/v1/hotels/search-by-coordinates?order_by=${query.order_by}&adults_number=${query.adult_num}&units=metric&room_number=${query.room_num}&checkout_date=${query.checkout_date}&filter_by_currency=AED&locale=${locale}&checkin_date=${query.checkin_date}&latitude=${state.search.location[0]}&longitude=${state.search.location[1]}&children_number=2&children_ages=5%2C0&categories_filter_ids=class%3A%3A2%2Cclass%3A%3A4%2Cfree_cancellation%3A%3A1&page_number=0&include_adjacency=true`;
     const data = await getJSON(url, options);
 
+    if (!data.result) return;
     state.search.results = data.result.map((data) => {
       return {
         hotel_name: data.hotel_name,
@@ -95,7 +90,6 @@ export const getSearchResult = async function () {
     });
     //update total page
     state.totalPage = Math.ceil(state.search.results.length / NUM_PER_PAGE);
-    console.log(state);
   } catch (err) {
     alert(err);
   }
@@ -112,7 +106,6 @@ export const loadCurHotelPhotos = async function () {
   try {
     const locale = state.locale;
     const id = state.curId;
-    // const id = state.test_id;
 
     const url = `https://booking-com.p.rapidapi.com/v1/hotels/photos?locale=${locale}&hotel_id=${id}`;
 
@@ -124,10 +117,9 @@ export const loadCurHotelPhotos = async function () {
         photo_1440: data.url_1440,
         photo_1280: data.url_max,
         photo_square_60: data.url_square60,
-        tags: data.tags, //[{tag: '', id: 123}, {...}]
+        tags: data.tags,
       };
     });
-    console.log(state);
   } catch (error) {
     alert(error);
   }
@@ -136,19 +128,15 @@ export const loadCurHotelPhotos = async function () {
 export const loadCurHotelNearbyandQA = async function () {
   try {
     const locale = state.locale;
-
     const id = state.curId;
-    // const id = state.test_id;
     const hightlightPromise = fetch(
       `https://booking-com.p.rapidapi.com/v1/hotels/location-highlights?hotel_id=${id}&locale=${locale}`,
       options
     );
-
     const questionsPromise = fetch(
       `https://booking-com.p.rapidapi.com/v1/hotels/questions?locale=${locale}&hotel_id=${id}`,
       options
     );
-
     const res = await Promise.allSettled([hightlightPromise, questionsPromise]);
     //error handling
     if (!res[0].value.ok)

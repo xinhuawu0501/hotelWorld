@@ -1,4 +1,3 @@
-import { now } from "../js/helper.js";
 class SearchView {
   _parentEl = document.querySelector(".search");
 
@@ -8,7 +7,6 @@ class SearchView {
   }
   getQuery() {
     const result = this._parentEl.elements;
-    console.log(result[5].value, result[6].value);
     const checkInDate = new Date(result[5].value).toISOString().split("T")[0];
     const checkOutDate = new Date(result[6].value).toISOString().split("T")[0];
     //check total guest>0 && room number > 0
@@ -33,7 +31,6 @@ class SearchView {
       alert("Cannot stay less than one night");
       return;
     }
-    console.log(result[5].value, result[6].value);
     return {
       location: result[0].value.toLowerCase(),
       order_by: result[1].value.toLowerCase(),

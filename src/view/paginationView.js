@@ -1,5 +1,4 @@
 import View from "./view";
-import { NUM_PER_PAGE } from "../js/config.js";
 import icons from "url:../img/icons.svg";
 class PaginationView extends View {
   _parentEl = document.querySelector(".pagination");
@@ -70,10 +69,8 @@ class PaginationView extends View {
       const btn = e.target.closest(".btn--inline");
 
       if (!btn) return;
-      console.log(btn);
 
       const goToPage = +btn.dataset.goto;
-      console.log(goToPage);
       handler(goToPage);
     });
   }
