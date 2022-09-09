@@ -2040,7 +2040,12 @@ class SearchView {
         this._parentEl.addEventListener("submit", (e)=>{
             e.preventDefault();
             handler();
-            for (const inputField of e.target)inputField.value = "";
+            for (const inputField of e.target){
+                if (inputField.getAttribute("id") === "guest__num-adult" || inputField.classList.contains("room__num")) inputField.value = 1;
+                else if (inputField.getAttribute("id") === "guest__num-kid") inputField.value = 0;
+                else if (inputField.getAttribute("id") === "order-by") inputField.value = "popularity";
+                else inputField.value = "";
+            }
         });
     }
 }
@@ -2149,8 +2154,6 @@ parcelHelpers.defineInteropFlag(exports);
 var _iconsSvg = require("url:../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class View {
-    _parentEl;
-    _data;
     clear() {
         this._parentEl.innerHTML = "";
     }

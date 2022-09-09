@@ -1,9 +1,6 @@
 import icons from "url:../img/icons.svg";
 
 export default class View {
-  _parentEl;
-  _data;
-
   clear() {
     this._parentEl.innerHTML = "";
   }

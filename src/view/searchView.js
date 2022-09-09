@@ -47,7 +47,16 @@ class SearchView {
       handler();
 
       for (const inputField of e.target) {
-        inputField.value = "";
+        if (
+          inputField.getAttribute("id") === "guest__num-adult" ||
+          inputField.classList.contains("room__num")
+        )
+          inputField.value = 1;
+        else if (inputField.getAttribute("id") === "guest__num-kid")
+          inputField.value = 0;
+        else if (inputField.getAttribute("id") === "order-by")
+          inputField.value = "popularity";
+        else inputField.value = "";
       }
     });
   }

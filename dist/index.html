@@ -1,1 +1,87 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400;0,500;0,600;1,600;1,700&display=swap" rel="stylesheet"><link rel="stylesheet" href="/index.a3b26d47.css"><title>HotelWorld</title><script type="module" src="/index.68337b04.js"></script></head><body> <div class="container"> <nav class="nav"> <div class="nav__logo">HotelWorld</div> <ul class="nav__list"> <li class="nav__item nav__item-bookmark"> <svg class="icon icon-bookmark nav__item-bookmark--icon"><use xlink:href="/icons.c14567a0.svg#icon-bookmark-fill"/></svg> Favorites <ul class="nav__item__modal nav__item__modal-bookmark"></ul> </li> </ul> </nav> <header class="header"> <form class="search" method="get"> <div class="search__input__item search__input__item-text"> <input type="text" name="location" class="input search__input__item-text--search-field" placeholder="Search hotel by location..." required oninvalid="setCustomValidity('Enter location to continue')" oninput="setCustomValidity('')"> <span class="search__input__item-text--sort"> <label for="order-by">Sort by</label> <select name="order-by" id="order-by" class="input"> <option value="popularity">Popularity</option> <option value="review_score">Review score</option> <option value="price">Price</option> </select> </span> </div> <div class="search__input__item search__input__item-numbers"> <span> <label for="guest__num-adult">Adult</label> <input type="number" name="adult__num" class="guest__num input" id="guest__num-adult" min="0" value="1" required> </span> <span> <label for="guest__num-kid">Kid</label> <input type="number" class="guest__num input" name="kid__num" id="guest__num-kid" min="0" value="0" required> </span> <span> <label for="room__num">Room</label> <input type="number" name="room__num" class="input room__num" id="room__num" min="0" value="1" required> </span> </div> <div class="search__input__item search__input__item-dates"> <span> <label for="check-in-date">Check-in</label> <input type="date" class="calender input" name="check-in-date" id="check-in-date" required oninvalid="setCustomValidity('Enter check-in date to continue')" oninput="setCustomValidity('')"> </span> <span> <label for="check-out-date">Check-out</label> <input type="date" class="calender input" name="check-out-date" id="check-out-date" required oninvalid="setCustomValidity('Enter check-out to continue')" oninput="setCustomValidity('')"> </span> </div> <button class="btn search__btn search__input__item search__input__item-btn"> <svg class="search__icon icon"><use href="/icons.c14567a0.svg#icon-search"/></svg> <span>Search</span> </button> </form> </header> <div class="search-results"> <ul class="results"></ul> <div class="pagination"></div> </div> <div class="details"></div> </div> <div class="hidden overlay"></div> <p class="copyright">&copy; Copyright by Xin Hua Wu</p> </body></html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Cabin:ital,wght@0,400;0,500;0,600;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/index.f7626f62.css">
+    <title>HotelWorld</title>
+    <script src="./src/js/config.js" defer=""></script>
+    <script src="/index.e37f48ea.js" defer=""></script>
+  </head>
+  <body>
+    <div class="container">
+      <nav class="nav">
+        <div class="nav__logo">HotelWorld</div>
+        <ul class="nav__list">
+          <li class="nav__item nav__item-bookmark">
+            <svg class="icon icon-bookmark nav__item-bookmark--icon">
+              <use xlink:href="/icons.21bad73c.svg#icon-bookmark-fill"></use>
+            </svg>
+            Favorites
+            <ul class="nav__item__modal nav__item__modal-bookmark"></ul>
+          </li>
+        </ul>
+      </nav>
+      <header class="header">
+        <form class="search" method="get">
+          <div class="search__input__item search__input__item-text">
+            <input type="text" name="location" class="input search__input__item-text--search-field" placeholder="Search hotel by location..." required="" oninvalid="setCustomValidity('Enter location to continue')" oninput="setCustomValidity('')">
+            <span class="search__input__item-text--sort">
+              <label for="order-by">Sort by</label>
+              <select name="order-by" id="order-by" class="input">
+                <option value="popularity">Popularity</option>
+                <option value="review_score">Review score</option>
+                <option value="price">Price</option>
+              </select>
+            </span>
+          </div>
+
+          <div class="search__input__item search__input__item-numbers">
+            <span>
+              <label for="guest__num-adult">Adult</label>
+              <input type="number" name="adult__num" class="input guest__num" id="guest__num-adult" min="0" value="1" required="">
+            </span>
+            <span>
+              <label for="guest__num-kid">Kid</label>
+              <input type="number" class="input guest__num" name="kid__num" id="guest__num-kid" min="0" value="0" required="">
+            </span>
+            <span>
+              <label for="room__num">Room</label>
+              <input type="number" name="room__num" class="input room__num" id="room__num" min="0" value="1" required="">
+            </span>
+          </div>
+          <div class="search__input__item search__input__item-dates">
+            <span>
+              <label for="check-in-date">Check-in</label>
+              <input type="date" class="input calender" name="check-in-date" id="check-in-date" required="" oninvalid="setCustomValidity('Enter check-in date to continue')" oninput="setCustomValidity('')">
+            </span>
+            <span>
+              <label for="check-out-date">Check-out</label>
+              <input type="date" class="input calender" name="check-out-date" id="check-out-date" required="" oninvalid="setCustomValidity('Enter check-out date to continue')" oninput="setCustomValidity('')">
+            </span>
+          </div>
+          <button class="btn search__btn search__input__item search__input__item-btn">
+            <svg class="search__icon icon">
+              <use href="/icons.21bad73c.svg#icon-search"></use>
+            </svg>
+            <span>Search</span>
+          </button>
+        </form>
+      </header>
+
+      <div class="search-results">
+        <ul class="results"></ul>
+        <div class="pagination"></div>
+      </div>
+      <div class="details"></div>
+    </div>
+
+    <div class="overlay hidden"></div>
+    <p class="copyright">&copy; Copyright by Xin Hua Wu</p>
+  </body>
+</html>
